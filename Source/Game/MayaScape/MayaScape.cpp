@@ -1724,6 +1724,8 @@ void MayaScape::SubscribeToEvents() {
     // Events sent between client & server (remote events) must be explicitly registered or else they are not allowed to be received
     GetSubsystem<Network>()->RegisterRemoteEvent(E_CLIENTOBJECTID);
 
+//    SubscribeToEvent(E_CLIENTOBJECTID, URHO3D_HANDLER(MayaScape, HandleClientObjectID));
+
 //    SubscribeToEvent(E_CLIENTSCENELOADED, URHO3D_HANDLER(MayaScape, HandleClientSceneLoaded));
 
 //    SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(MyApp, HandleKeyDown));

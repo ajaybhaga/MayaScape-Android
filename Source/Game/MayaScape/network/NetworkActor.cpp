@@ -105,7 +105,7 @@ void NetworkActor::Create() {
 
     // Place on track
 //    vehicleNode->SetPosition(Vector3(-814.0f+Random(-400.f, 400.0f), 150.0f, -595.0f+Random(-400.f, 400.0f)));
-    vehicleNode->SetPosition(Vector3(0, 100, 0));
+    vehicleNode->SetPosition(Vector3(0, 0, 0));
 
 // Create the vehicle logic component
     vehicle_ = vehicleNode->CreateComponent<Vehicle>(LOCAL);

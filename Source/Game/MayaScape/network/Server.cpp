@@ -395,6 +395,7 @@ void Server::HandleClientDisconnected(StringHash eventType, VariantMap& eventDat
     Node* object = serverObjects_[connection];
     if (object)
     {
+        URHO3D_LOGINFOF("**** DESTROYING CLIENT NETWORK OBJECT -> %d", object->GetID());
         object->Remove();
     }
 
