@@ -1,1 +1,0 @@
-/bin/c++  -mtune=generic  -std=gnu++11 -Wno-invalid-offsetof -march=native -ffast-math -msse3 -pthread -fdiagnostics-color=auto -g -DDEBUG -D_DEBUG  -rdynamic CMakeFiles/39_CrowdNavigation.dir/CrowdNavigation.cpp.o  -o ../../../../bin/39_CrowdNavigation  ../../../../lib/libUrho3D.a -ldl -lm -lrt -lGL 

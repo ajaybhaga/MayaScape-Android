@@ -167,9 +167,9 @@ const int MSG_NODE_ERROR = 156;
 
 #define INGAME_FONT "Fonts/m6x11.ttf"
 
-#define GAME_SERVER_ADDRESS "192.168.122.1"
+//#define GAME_SERVER_ADDRESS "192.168.122.1"
 //#define GAME_SERVER_ADDRESS "localhost"
-//#define GAME_SERVER_ADDRESS "www.monkeymaya.com"
+#define GAME_SERVER_ADDRESS "www.monkeymaya.com"
 
 int numOfBoidsets = 10; // needs to be an even number for the boid splitting to work properly
 int updateCycleIndex = 0;
@@ -1737,6 +1737,7 @@ void MayaScape::SubscribeToEvents() {
     // Subscribe to PostRenderUpdate to draw debug geometry
     SubscribeToEvent(E_POSTRENDERUPDATE, URHO3D_HANDLER(MayaScape, HandlePostRenderUpdate));
 
+    SubscribeToEvent(E_JOYSTICKHATMOVE, URHO3D_HANDLER(MayaScape, HandleJoystickHatMove));
 }
 
 
@@ -3064,6 +3065,9 @@ void MayaScape::HandleUpdate(StringHash eventType, VariantMap &eventData) {
             // Set player to vehicle control
             player_->SetControls(player_->GetVehicle()->controls_);
 
+
+
+
 /*
             // Add yaw & pitch from the mouse motion or touch input. Used only for the camera, does not affect motion
             if (touchEnabled_)
@@ -3381,6 +3385,40 @@ void MayaScape::HandlePostRenderUpdate(StringHash eventType, VariantMap &eventDa
     }
 
 }
+
+void MayaScape::HandleJoystickHatMove(StringHash eventType, VariantMap &eventData) {
+
+    using namespace JoystickHatMove;
+    int joystickID = eventData[P_JOYSTICKID].GetInt();
+    int hat = eventData[P_HAT].GetInt();
+    int value = eventData[P_POSITION].GetInt();
+
+    // Clear network control bits
+    ntwkControls_.Set(NTWK_CTRL_FORWARD, 0);
+    ntwkControls_.Set(NTWK_CTRL_LEFT, 0);
+    ntwkControls_.Set(NTWK_CTRL_RIGHT, 0);
+    ntwkControls_.Set(NTWK_CTRL_BACK, 0);
+
+    switch (value) {
+        case 1: // up
+            ntwkControls_.Set(NTWK_CTRL_FORWARD, 1);
+            break;
+
+        case 2: // right
+            ntwkControls_.Set(NTWK_CTRL_RIGHT, 1);
+        break;
+
+        case 8: // left
+            ntwkControls_.Set(NTWK_CTRL_LEFT, 1);
+            break;
+
+        case 4: // down
+            ntwkControls_.Set(NTWK_CTRL_BACK, 1);
+            break;
+
+    }
+}
+
 
 void MayaScape::ReloadScene(bool reInit) {
 /*
@@ -3909,15 +3947,15 @@ void MayaScape::HandlePhysicsPreStep(StringHash eventType, VariantMap &eventData
         Input *input = GetSubsystem<Input>();
 
         // set controls and pos
-        Controls controls;
-        controls.yaw_ = yaw_;
+        ntwkControls_.yaw_ = yaw_;
 
-        controls.Set(NTWK_CTRL_FORWARD, input->GetKeyDown(KEY_W));
-        controls.Set(NTWK_CTRL_BACK, input->GetKeyDown(KEY_S));
-        controls.Set(NTWK_CTRL_LEFT, input->GetKeyDown(KEY_A));
-        controls.Set(NTWK_CTRL_RIGHT, input->GetKeyDown(KEY_D));
-        controls.Set(NTWK_SWAP_MAT, input->GetKeyDown(KEY_T));
-
+        /*
+     //   ntwkControls_.Set(NTWK_CTRL_FORWARD, input->GetKeyDown(KEY_W));
+        ntwkControls_.Set(NTWK_CTRL_BACK, input->GetKeyDown(KEY_S));
+        ntwkControls_.Set(NTWK_CTRL_LEFT, input->GetKeyDown(KEY_A));
+        ntwkControls_.Set(NTWK_CTRL_RIGHT, input->GetKeyDown(KEY_D));
+        ntwkControls_.Set(NTWK_SWAP_MAT, input->GetKeyDown(KEY_T));
+*/
         char str[50];
 //        sprintf(str, "[%f, %f, %f]", actorNode->GetPosition().x_, actorNode->GetPosition().y_, actorNode->GetPosition().z_);
 
@@ -3937,7 +3975,7 @@ void MayaScape::HandlePhysicsPreStep(StringHash eventType, VariantMap &eventData
             }
         }
 
-        server->UpdatePhysicsPreStep(controls);
+        server->UpdatePhysicsPreStep(ntwkControls_);
 
         if (isServer_) {
             using namespace Update;

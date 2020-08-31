@@ -162,7 +162,10 @@ private:
     void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle the post render update event.
     void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
-    /// Handle the end rendering event.
+
+    void HandleJoystickHatMove(StringHash eventType, VariantMap &eventData);
+
+        /// Handle the end rendering event.
     void HandleSceneRendered(StringHash eventType, VariantMap& eventData);
     void HandleNodeCollision(StringHash eventType, VariantMap& eventData);
     /// Handle the contact begin event (Box2D contact listener).
@@ -214,6 +217,8 @@ private:
     String initialScene_;
     bool started_; // Is Game started?
     Vector<Urho3D::String> loginList_;
+
+    Controls ntwkControls_;
 
     SharedPtr<Window> msgWindow_;
 
