@@ -77,7 +77,7 @@ bool GameController::CreateController()
         RemoveScreenJoystick();
 
         // and create our own
-        XMLFile *layout = cache->GetResource<XMLFile>("ScreenJoystick/ScreenJoystick.xml");
+        XMLFile *layout = cache->GetResource<XMLFile>("ScreenJoystick/ScreenJoystickDPAD.xml");
         joystickID_ = input->AddScreenJoystick(layout, cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
     }
     else

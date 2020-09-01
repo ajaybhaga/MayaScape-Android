@@ -390,15 +390,22 @@ void Server::HandleClientDisconnected(StringHash eventType, VariantMap& eventDat
     // (On server)
     // This updates the login list by allowing a few cycles to update
 
+
     // When a client disconnects, remove the controlled object
     Connection* connection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
     Node* object = serverObjects_[connection];
+    NetworkActor* actor = actorMap_[connection];
     if (object)
     {
-        URHO3D_LOGINFOF("**** DESTROYING CLIENT NETWORK OBJECT -> %d", object->GetID());
+        URHO3D_LOGINFOF("**** DESTROYING CLIENT OBJECT -> %d", object->GetID());
         object->Remove();
     }
 
+    if (actor)
+    {
+        URHO3D_LOGINFOF("**** DESTROYING CLIENT NETWORK ACTOR OBJECT -> %d", actor->GetID());
+        actor->Remove();
+    }
 
     Vector<Connection*> connectList = loginList_.Values();
 
@@ -416,6 +423,7 @@ void Server::HandleClientDisconnected(StringHash eventType, VariantMap& eventDat
     }
 
     serverObjects_.Erase(connection);
+    actorMap_.Erase(connection);
 
     OutputLoginListToConsole();
 

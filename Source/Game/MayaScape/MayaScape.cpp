@@ -167,9 +167,9 @@ const int MSG_NODE_ERROR = 156;
 
 #define INGAME_FONT "Fonts/m6x11.ttf"
 
-//#define GAME_SERVER_ADDRESS "192.168.122.1"
+#define GAME_SERVER_ADDRESS "192.168.122.1"
 //#define GAME_SERVER_ADDRESS "localhost"
-#define GAME_SERVER_ADDRESS "www.monkeymaya.com"
+//#define GAME_SERVER_ADDRESS "www.monkeymaya.com"
 
 int numOfBoidsets = 10; // needs to be an even number for the boid splitting to work properly
 int updateCycleIndex = 0;
@@ -1739,7 +1739,7 @@ void MayaScape::SubscribeToEvents() {
     // Subscribe to PostRenderUpdate to draw debug geometry
     SubscribeToEvent(E_POSTRENDERUPDATE, URHO3D_HANDLER(MayaScape, HandlePostRenderUpdate));
 
-    SubscribeToEvent(E_JOYSTICKHATMOVE, URHO3D_HANDLER(MayaScape, HandleJoystickHatMove));
+  //  SubscribeToEvent(E_JOYSTICKHATMOVE, URHO3D_HANDLER(MayaScape, HandleJoystickHatMove));
 }
 
 
@@ -2757,6 +2757,9 @@ void MayaScape::HandleUpdate(StringHash eventType, VariantMap &eventData) {
         }
     }
 
+    GameController *gameController = GetSubsystem<GameController>();
+    gameController->UpdateControlInputs(ntwkControls_);
+
     float deltaSum;
 
     if (player_) {
@@ -2774,9 +2777,9 @@ void MayaScape::HandleUpdate(StringHash eventType, VariantMap &eventData) {
 
     */
 
-        GameController *gameController = GetSubsystem<GameController>();
         player_->GetVehicle()->controls_.buttons_ = 0;
-        gameController->UpdateControlInputs(player_->GetVehicle()->controls_);
+//        gameController->UpdateControlInputs(player_->GetVehicle()->controls_);
+
 
 
         /*

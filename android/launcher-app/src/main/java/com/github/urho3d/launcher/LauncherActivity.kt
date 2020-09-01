@@ -41,7 +41,7 @@ class LauncherActivity : ExpandableListActivity() {
         // Only the sample library is selectable, excluding Urho3DPlayer which is handled separately
         val regex = Regex("^(?:Urho3D.*|.+_shared)\$")
         val libraryNames = UrhoActivity.getLibraryNames(this)
-        val items = mutableMapOf("C++" to libraryNames.filterNot { regex.matches(it) }.sorted())
+        val items = mutableMapOf("MayaScape" to libraryNames.filterNot { regex.matches(it) }.sorted())
 
 
 
@@ -50,7 +50,7 @@ class LauncherActivity : ExpandableListActivity() {
 
         setListAdapter(SimpleExpandableListAdapter(this,
                 items.map {
-                    mapOf("api" to it.key, "info" to "Click to expand/collapse")
+                    mapOf("api" to it.key, "info" to "Apps")
                 },
                 android.R.layout.simple_expandable_list_item_2,
                 arrayOf("api", "info"),
