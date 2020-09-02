@@ -2839,6 +2839,11 @@ void MayaScape::UpdateButtons() {
     //  textEdit_->SetVisible(!serverConnection && !serverRunning);
 }
 
+void MayaScape::SetAerialCamera() {
+    // Apply camera transformations
+    cameraNode_->SetPosition(Vector3(0.0f, 160.0f, 0.0f));
+    cameraNode_->SetRotation(Quaternion(90.0f, 0.0f, 0.0f));
+}
 
 void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
     // Right mouse button controls mouse cursor visibility: hide when pressed
@@ -2873,7 +2878,11 @@ void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
 
                 //URHO3D_LOGINFOF("--- Found controllable object: %u", clientObjectID_);
 
+
+                // TODO: Client don't have a network actor -> this will crash
+
                 if (actorNode) {
+
                     const float CAMERA_DISTANCE = 8.0f;
 
                     Vector3 startPos = actorNode->GetPosition();
@@ -3006,9 +3015,14 @@ void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
 
 
                     showInstructions = true;
+
+                    URHO3D_LOGINFO("--- Retrieved NetworkActor.");
+                    SetAerialCamera();
+
+
                 } else {
                     URHO3D_LOGINFO("--- Could not get NetworkActor, aborting.");
-                    SaveScene(false);
+                    //SaveScene(false);
                 }
             } else {
                 URHO3D_LOGINFO("--- Could not find controllable object, aborting.");
@@ -3016,6 +3030,8 @@ void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
 
         } else {
             // Set server cam to aerial
+
+            SetAerialCamera();
 /*
             Vector3 startPos = Vector3(0.0f, 0.0f, 0.0f);
             targetCameraPos_ = startPos + Vector3(0, 30.0f, CAMERA_DISTANCE);
@@ -3048,9 +3064,6 @@ void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
                 }
             }*/
 
-            // Apply camera transformations
-            cameraNode_->SetPosition(Vector3(0.0f, 160.0f, 0.0f));
-            cameraNode_->SetRotation(Quaternion(90.0f, 0.0f, 0.0f));
         }
     }
 }

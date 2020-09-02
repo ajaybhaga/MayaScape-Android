@@ -136,13 +136,13 @@ Node* Server::CreateClientObject(Connection *connection)
 
 
 void Server::CreatePlayer(Connection* connection) {
-    Node *playerNode = scene_->CreateChild("Player", LOCAL);
+    Node *playerNode = scene_->CreateChild("Player", REPLICATED);
 
     // Place on track
 //    playerNode->SetPosition(Vector3(-814.0f + Random(-400.f, 400.0f), 400.0f, -595.0f + Random(-400.f, 400.0f)));
 
     // Player is replaced with NetworkActor -> which is a Player
-    NetworkActor* player_ = playerNode->CreateComponent<NetworkActor>(LOCAL);
+    NetworkActor* player_ = playerNode->CreateComponent<NetworkActor>();
     player_->isServer_ = true;
 
     // Store the player in map

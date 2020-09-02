@@ -106,6 +106,7 @@ class MayaScape : public Game
 
 
     void MoveCamera(Node *actorNode, float timeStep);
+    void SetAerialCamera();
 
 public:
     /// Construct.
