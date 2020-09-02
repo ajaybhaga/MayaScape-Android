@@ -72,6 +72,8 @@ public:
     void InitializeScene(File &file);
 
     void CreatePlayer(Connection* connection);
+    void DestroyPlayer(Connection* connection);
+
     Node* CreateClientObject(Connection *connection);
     void UpdatePhysicsPreStep(const Controls &controls);
     void UpdateActors(float timeStep);

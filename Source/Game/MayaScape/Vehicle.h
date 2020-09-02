@@ -25,6 +25,8 @@
 #include <Urho3D/Scene/LogicComponent.h>
 #include <Urho3D/Audio/SoundSource3D.h>
 #include <Urho3D/Audio/Sound.h>
+#include <Urho3D/Graphics/StaticModel.h>
+#include <Urho3D/Physics/CollisionShape.h>
 
 #include "RaycastVehicle.h"
 
@@ -77,7 +79,7 @@ public:
     virtual void ApplyAttributes();
 
     /// Initialize the vehicle. Create rendering and physics components. Called by the application.
-    void Init(bool isServer);
+    void Init(bool isServer, Vector3 initialPos);
 
     /// Handle physics world update. Called by LogicComponent base class.
     virtual void FixedUpdate(float timeStep);
@@ -106,6 +108,7 @@ public:
     float GetSteering() const { return steering_; };
     void UpdateSteering(float newSteering);
     Vector3 GetForwardVector() { if (raycastVehicle_) { raycastVehicle_->GetForwardVector(); } else return Vector3::ZERO; }
+    Vector<Node*> GetWheels() const { return m_vpNodeWheel; }
 
     void DebugDraw(const Color &color);
     void SetVisible(bool visible);
@@ -136,6 +139,8 @@ protected:
 
 //
     SharedPtr<RaycastVehicle> raycastVehicle_;
+    SharedPtr<CollisionShape> hullColShape_;
+    SharedPtr<StaticModel> hullObject_;
 public:
     const SharedPtr<RaycastVehicle> &GetRaycastVehicle() const;
 

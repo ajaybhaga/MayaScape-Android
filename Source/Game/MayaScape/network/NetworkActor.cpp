@@ -71,8 +71,22 @@ NetworkActor::NetworkActor(Context *context)
 }
 
 NetworkActor::~NetworkActor() {
+
+    URHO3D_LOGINFOF("**** DESTROYING NetworkActor OBJECT -> %d", this->id_);
+
+    if (vehicle_) {
+        URHO3D_LOGINFOF("**** DESTROYING CLIENT VEHICLE OBJECT -> %d", this->id_);
+        vehicle_->Remove();
+    }
+
     if (nodeInfo_) {
+        URHO3D_LOGINFOF("**** DESTROYING CLIENT NODE OBJECT -> %d", this->id_);
         nodeInfo_->Remove();
+    }
+
+    if (pRigidBody_) {
+        URHO3D_LOGINFOF("**** DESTROYING CLIENT RIGID BODY OBJECT -> %d", this->id_);
+        pRigidBody_->Remove();
     }
 }
 
@@ -90,51 +104,52 @@ void NetworkActor::DelayedStart() {
 }
 
 // This will be run by server to create server objects (running the physics world)
-// This will be run by replicated client scene - to build local version
 void NetworkActor::Create() {
-    ResourceCache *cache = GetSubsystem<ResourceCache>();
 
-    Node *adjNode = GetScene()->CreateChild("AdjNode", LOCAL);
-    adjNode->SetRotation(Quaternion(0.0, 0.0, -90.0f));
+    if (!userName_.Empty()) {
+        ResourceCache *cache = GetSubsystem<ResourceCache>();
+
+        Node *adjNode = GetScene()->CreateChild("AdjNode", LOCAL);
+        adjNode->SetRotation(Quaternion(0.0, 0.0, -90.0f));
 
 
-    // Init vehicle
-    Node *vehicleNode = GetScene()->CreateChild("Vehicle", LOCAL);
+        // Init vehicle
+        Node *vehicleNode = GetScene()->CreateChild("Vehicle", LOCAL);
 
-    // Default at (0,300,0) above terrain before we set location
+        // Default at (0,300,0) above terrain before we set location
 
-    // Place on track
-//    vehicleNode->SetPosition(Vector3(-814.0f+Random(-400.f, 400.0f), 150.0f, -595.0f+Random(-400.f, 400.0f)));
-    vehicleNode->SetPosition(Vector3(0, 0, 0));
+        // Place on track
+//    vehicleNode->SetPosition(Vector3(-814.0f+Random(-400.f, 400.0f), 500.0f, -595.0f+Random(-400.f, 400.0f)));
 
-// Create the vehicle logic component
-    vehicle_ = vehicleNode->CreateComponent<Vehicle>(LOCAL);
-    vehicle_->Init(isServer_);
+        // Create the vehicle logic component
+        vehicle_ = vehicleNode->CreateComponent<Vehicle>(LOCAL);
+        float factor = 500.0f;
+        vehicle_->Init(isServer_, Vector3(Random(-factor, factor), 300, Random(-factor, factor)));
 
-    wpActiveIndex_ = 0;
-    targetAgentIndex_ = 0;
+        wpActiveIndex_ = 0;
+        targetAgentIndex_ = 0;
 
-    // physics components
+        // physics components
 //    pRigidBody_->SetUseGravity(false);
 
-    pRigidBody_ = vehicleNode->GetOrCreateComponent<RigidBody>();
-    /* pRigidBody_->SetCollisionLayer(NETWORKACTOR_COL_LAYER);
-     pRigidBody_->SetMass(mass_);
-     pRigidBody_->SetFriction(1.0f);
-     pRigidBody_->SetLinearDamping(0.5f);
-     pRigidBody_->SetAngularDamping(0.5f);
-     CollisionShape* shape = vehicleNode->GetOrCreateComponent<CollisionShape>(LOCAL);
-     shape->SetSphere(1.0f);*/
-    vehicleNode->SetRotation(Quaternion(0.0, -90.0, 0.0));
+        pRigidBody_ = vehicleNode->GetOrCreateComponent<RigidBody>();
+        /* pRigidBody_->SetCollisionLayer(NETWORKACTOR_COL_LAYER);
+         pRigidBody_->SetMass(mass_);
+         pRigidBody_->SetFriction(1.0f);
+         pRigidBody_->SetLinearDamping(0.5f);
+         pRigidBody_->SetAngularDamping(0.5f);
+         CollisionShape* shape = vehicleNode->GetOrCreateComponent<CollisionShape>(LOCAL);
+         shape->SetSphere(1.0f);*/
+        vehicleNode->SetRotation(Quaternion(0.0, -90.0, 0.0));
 
 
-    // create text3d client info node LOCALLY
-    nodeInfo_ = GetScene()->CreateChild("light", LOCAL);
-    floatingText_ = nodeInfo_->CreateComponent<Text3D>();
-    floatingText_->SetColor(Color::GREEN);
-    floatingText_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 20);
-    floatingText_->SetFaceCameraMode(FC_ROTATE_XYZ);
-    // create text3d client info node LOCALLY
+        // create text3d client info node LOCALLY
+        nodeInfo_ = GetScene()->CreateChild("light", LOCAL);
+        floatingText_ = nodeInfo_->CreateComponent<Text3D>();
+        floatingText_->SetColor(Color::GREEN);
+        floatingText_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 20);
+        floatingText_->SetFaceCameraMode(FC_ROTATE_XYZ);
+        // create text3d client info node LOCALLY
 //    nodeInfo_ = GetScene()->CreateChild("light", LOCAL);
 
 
@@ -146,8 +161,9 @@ void NetworkActor::Create() {
     text3D->SetText(userName_);
     text3D->SetFaceCameraMode(FC_ROTATE_XYZ);
 */
-    // register
-    SetUpdateEventMask(USE_FIXEDUPDATE);
+        // register
+        SetUpdateEventMask(USE_FIXEDUPDATE);
+    }
 }
 
 void NetworkActor::SwapMat() {
@@ -188,6 +204,8 @@ void NetworkActor::FixedUpdate(float timeStep) {
 
     // Only allow server to control objects based on received controls from clients
     if (isServer_) {
+
+//        vehicle_->GetNode()->SetPosition(Vector3(0, 300, 0));
 
         // Get updated controls
 //    actor->GetControls();

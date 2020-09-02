@@ -107,8 +107,19 @@ void	btRaycastVehicle::updateWheelTransform( int wheelIndex , bool interpolatedT
 	updateWheelTransformsWS(wheel,interpolatedTransform);
 	btVector3 up = -wheel.m_raycastInfo.m_wheelDirectionWS;
 	const btVector3& right = wheel.m_raycastInfo.m_wheelAxleWS;
-	btVector3 fwd = up.cross(right);
-	fwd = fwd.normalize();
+
+    // Avoid fuzzy zero crash
+
+    if (up.fuzzyZero())
+        up = btVector3(BT_ZERO, BT_ZERO, BT_ZERO);
+
+    btVector3 fwd = up.cross(right);
+
+    if (fwd.fuzzyZero())
+        fwd = btVector3(BT_ZERO, BT_ZERO, BT_ZERO);
+
+    if (!fwd.isZero())
+        fwd = fwd.normalize();
 //	up = right.cross(fwd);
 //	up.normalize();
 

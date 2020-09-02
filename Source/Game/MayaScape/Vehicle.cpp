@@ -142,13 +142,31 @@ Vehicle::Vehicle(Context* context)
 
     // sound
     playAccelerationSoundInAir_ = true;
+
+    node_ = GetNode();
 }
 
 //=============================================================================
 //=============================================================================
 Vehicle::~Vehicle()
 {
+    URHO3D_LOGINFOF("**** DESTROYING CLIENT VEHICLE WHEELS VECTOR -> %d", this->id_);
     m_vpNodeWheel.Clear();
+
+    if (raycastVehicle_) {
+        URHO3D_LOGINFOF("**** DESTROYING CLIENT RAYCAST VEHICLE OBJECT -> %d", this->id_);
+        raycastVehicle_->Remove();
+    }
+
+    if (hullColShape_) {
+        URHO3D_LOGINFOF("**** DESTROYING CLIENT VEHICLE COLLISION SHAPE OBJECT -> %d", this->id_);
+        hullColShape_->Remove();
+    }
+
+    if (hullObject_) {
+        URHO3D_LOGINFOF("**** DESTROYING CLIENT VEHICLE MODEL OBJECT -> %d", this->id_);
+        hullObject_->Remove();
+    }
 }
 
 //=============================================================================
@@ -172,7 +190,7 @@ void Vehicle::ApplyAttributes()
 // This function is called only from the main program when initially creating 
 // the vehicle, not on scene load
 //=============================================================================
-void Vehicle::Init(bool isServer)
+void Vehicle::Init(bool isServer, Vector3 initialPos)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
@@ -184,6 +202,8 @@ void Vehicle::Init(bool isServer)
     Node* adjNode = node_->CreateChild("AdjNode", LOCAL);
     adjNode->SetRotation(Quaternion(0.0, 0.0, -90.0f));
 
+    node_->SetPosition(initialPos);
+
 /*
     // On client
     if (!isServer) {
@@ -193,11 +213,15 @@ void Vehicle::Init(bool isServer)
         raycastVehicle_ = node_->CreateComponent<RaycastVehicle>();
     }
 */
+
+//    Node *vehicleNode = GetScene()->CreateChild("Vehicle", LOCAL);
+
     raycastVehicle_ = node_->CreateComponent<RaycastVehicle>(LOCAL);
     raycastVehicle_->SetEnabled(true);
+    raycastVehicle_->GetNode()->SetPosition(initialPos);
 
-    CollisionShape* hullColShape = node_->CreateComponent<CollisionShape>(LOCAL);
-    StaticModel* hullObject = node_->CreateComponent<StaticModel>(LOCAL);
+    hullColShape_ = node_->CreateComponent<CollisionShape>(LOCAL);
+    hullObject_ = node_->CreateComponent<StaticModel>(LOCAL);
 
 //    raycastVehicle_->GetNode()->SetScale(3.0f);
 
@@ -214,11 +238,11 @@ void Vehicle::Init(bool isServer)
 
     Model *vehModel = cache->GetResource<Model>("Models/Vehicles/Offroad/Models/body-car.mdl");
 
-    hullObject->SetModel(vehModel);
+    hullObject_->SetModel(vehModel);
 //    hullObject->SetMaterial(cache->GetResource<Material>("Data/Models/Vehicles/Offroad/Materials/phong1.xml"));
-    hullObject->ApplyMaterialList("Models/Vehicles/Offroad/Models/body-car.txt");
+    hullObject_->ApplyMaterialList("Models/Vehicles/Offroad/Models/body-car.txt");
 
-    hullObject->SetCastShadows(true);
+    hullObject_->SetCastShadows(true);
 
     // set convex hull and resize local AABB.Y size
 //    Model *vehColModel = cache->GetResource<Model>("Models/Vehicles/Offroad/Models/offroadVehicle.mdl");
@@ -226,11 +250,11 @@ void Vehicle::Init(bool isServer)
 
 //    hullObject->GetNode()->SetRotation(Quaternion(0.0, 180.0f, 0.0f));
 //    hullObject->GetNode()->SetScale(Vector3(0.01f, 0.01f, 0.01f));
-    hullObject->GetNode()->SetScale(Vector3(0.3f, 0.3f, 0.3f));
+    hullObject_->GetNode()->SetScale(Vector3(0.3f, 0.3f, 0.3f));
 
-    hullColShape->SetConvexHull(vehColModel);
-    hullColShape->GetNode()->SetRotation(Quaternion(0.0, 0.0f, -90.0f));
-    hullColShape->GetNode()->SetScale(Vector3(0.3f, 0.3f, 0.3f));
+    hullColShape_->SetConvexHull(vehColModel);
+    hullColShape_->GetNode()->SetRotation(Quaternion(0.0, 0.0f, -90.0f));
+    hullColShape_->GetNode()->SetScale(Vector3(0.3f, 0.3f, 0.3f));
 
     raycastVehicle_->CompoundScaleLocalAabbMin(Vector3(0.7f, 0.5f, 1.0f));
     raycastVehicle_->CompoundScaleLocalAabbMax(Vector3(0.7f, 0.5f, 1.0f));

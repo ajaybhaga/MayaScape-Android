@@ -138,8 +138,6 @@ Node* Server::CreateClientObject(Connection *connection)
 void Server::CreatePlayer(Connection* connection) {
     Node *playerNode = scene_->CreateChild("Player", LOCAL);
 
-    playerNode->SetPosition(Vector3(0, 0, 0));
-
     // Place on track
 //    playerNode->SetPosition(Vector3(-814.0f + Random(-400.f, 400.0f), 400.0f, -595.0f + Random(-400.f, 400.0f)));
 
@@ -150,7 +148,11 @@ void Server::CreatePlayer(Connection* connection) {
     // Store the player in map
     actorMap_.Populate(connection, player_);
 
-    player_->GetNode()->SetPosition(Vector3(0, 0, 0));
+//    player_->GetNode()->SetPosition(Vector3(0, 0, 0));
+
+    // If actor has a vehicle, snap the actor to vehicle
+//    if (player_->vehicle_)
+//        player_->GetNode()->SetPosition(player_->vehicle_->GetNode()->GetPosition());
 
 //    player_->SetWaypoints(&waypointsWorld_);
 
@@ -208,6 +210,11 @@ void Server::UpdateActors(float timeStep) {
             if (actor) {
                 // Apply update to actor
                 actor->FixedUpdate(timeStep);
+
+                // If actor has a vehicle, snap the actor to vehicle
+                if (actor->vehicle_)
+                    actor->GetNode()->SetPosition(actor->vehicle_->GetNode()->GetPosition());
+
             }
         }
     }
@@ -382,19 +389,12 @@ void Server::HandleClientConnected(StringHash eventType, VariantMap& eventData)
 
 }
 
-void Server::HandleClientDisconnected(StringHash eventType, VariantMap& eventData)
-{
-    using namespace ClientConnected;
-    URHO3D_LOGINFO("HandleClientDisconnected");
+void Server::DestroyPlayer(Connection* connection) {
 
-    // (On server)
-    // This updates the login list by allowing a few cycles to update
-
-
-    // When a client disconnects, remove the controlled object
-    Connection* connection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
     Node* object = serverObjects_[connection];
     NetworkActor* actor = actorMap_[connection];
+
+
     if (object)
     {
         URHO3D_LOGINFOF("**** DESTROYING CLIENT OBJECT -> %d", object->GetID());
@@ -425,6 +425,22 @@ void Server::HandleClientDisconnected(StringHash eventType, VariantMap& eventDat
     serverObjects_.Erase(connection);
     actorMap_.Erase(connection);
 
+    // Remove raycast vehicle -> to prevent bullet physics crash
+}
+
+void Server::HandleClientDisconnected(StringHash eventType, VariantMap& eventData)
+{
+    using namespace ClientConnected;
+    URHO3D_LOGINFO("HandleClientDisconnected");
+
+    // (On server)
+    // This updates the login list by allowing a few cycles to update
+
+
+    // When a client disconnects, remove the controlled object
+    Connection* connection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
+    // Destroy client player (network actor, vehicle, raycast vehicle)
+    DestroyPlayer(connection);
     OutputLoginListToConsole();
 
     URHO3D_LOGINFO("**** HandleClientDisconnected COMPLETED");

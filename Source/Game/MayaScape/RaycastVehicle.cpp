@@ -22,6 +22,7 @@
 #include <Urho3D/Core/Context.h>
 #include <Urho3D/Physics/PhysicsWorld.h>
 #include <Urho3D/Physics/PhysicsUtils.h>
+#include <Urho3D/IO/Log.h>
 #include <Bullet/BulletDynamics/Vehicle/btRaycastVehicle.h>
 #include <Bullet/BulletDynamics/Dynamics/btDynamicsWorld.h>
 #include <Bullet/BulletCollision/CollisionShapes/btCompoundShape.h>
@@ -60,7 +61,7 @@ RaycastVehicle::~RaycastVehicle()
         {
             btDynamicsWorld *pbtDynWorld = (btDynamicsWorld *)GetPhysicsWorld()->GetWorld();
             pbtDynWorld->removeVehicle(raycastVehicle_);
-
+            URHO3D_LOGINFO("**** DESTROYING CLIENT RAYCAST VEHICLE FROM PHYSICS DYNAMICS WORLD");
         }
         delete raycastVehicle_;
         raycastVehicle_ = NULL;
