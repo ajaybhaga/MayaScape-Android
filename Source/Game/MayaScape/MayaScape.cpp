@@ -168,7 +168,8 @@ const int MSG_NODE_ERROR = 156;
 
 #define INGAME_FONT "Fonts/m6x11.ttf"
 
-#define GAME_SERVER_ADDRESS "192.168.122.1"
+#define GAME_SERVER_ADDRESS "159.203.38.221"
+//#define GAME_SERVER_ADDRESS "192.168.122.1"
 //#define GAME_SERVER_ADDRESS "localhost"
 //#define GAME_SERVER_ADDRESS "www.monkeymaya.com"
 
