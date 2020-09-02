@@ -109,12 +109,12 @@ void NetworkActor::Create() {
     if (!userName_.Empty()) {
         ResourceCache *cache = GetSubsystem<ResourceCache>();
 
-        Node *adjNode = GetScene()->CreateChild("AdjNode", LOCAL);
+        Node *adjNode = GetScene()->CreateChild("AdjNode", REPLICATED);
         adjNode->SetRotation(Quaternion(0.0, 0.0, -90.0f));
 
 
         // Init vehicle
-        Node *vehicleNode = GetScene()->CreateChild("Vehicle", LOCAL);
+        Node *vehicleNode = GetScene()->CreateChild("Vehicle", REPLICATED);
 
         // Default at (0,300,0) above terrain before we set location
 
@@ -122,7 +122,7 @@ void NetworkActor::Create() {
 //    vehicleNode->SetPosition(Vector3(-814.0f+Random(-400.f, 400.0f), 500.0f, -595.0f+Random(-400.f, 400.0f)));
 
         // Create the vehicle logic component
-        vehicle_ = vehicleNode->CreateComponent<Vehicle>(LOCAL);
+        vehicle_ = vehicleNode->CreateComponent<Vehicle>();
         float factor = 500.0f;
         vehicle_->Init(isServer_, Vector3(Random(-factor, factor), 300, Random(-factor, factor)));
 
@@ -144,7 +144,7 @@ void NetworkActor::Create() {
 
 
         // create text3d client info node LOCALLY
-        nodeInfo_ = GetScene()->CreateChild("light", LOCAL);
+        nodeInfo_ = GetScene()->CreateChild("light", REPLICATED);
         floatingText_ = nodeInfo_->CreateComponent<Text3D>();
         floatingText_->SetColor(Color::GREEN);
         floatingText_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 20);

@@ -215,6 +215,8 @@ void Server::UpdateActors(float timeStep) {
                 if (actor->vehicle_)
                     actor->GetNode()->SetPosition(actor->vehicle_->GetNode()->GetPosition());
 
+                // Mark actor to update on network for replicate nodes
+                actor->MarkNetworkUpdate();
             }
         }
     }

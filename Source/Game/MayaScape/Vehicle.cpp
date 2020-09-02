@@ -199,7 +199,7 @@ void Vehicle::Init(bool isServer, Vector3 initialPos)
     SubscribeToEvent(GetNode(), E_NODECOLLISION, URHO3D_HANDLER(Vehicle, HandleVehicleCollision));
 
 //E_NODECOLLISIONSTART
-    Node* adjNode = node_->CreateChild("AdjNode", LOCAL);
+    Node* adjNode = node_->CreateChild("AdjNode", REPLICATED);
     adjNode->SetRotation(Quaternion(0.0, 0.0, -90.0f));
 
     node_->SetPosition(initialPos);
@@ -216,12 +216,12 @@ void Vehicle::Init(bool isServer, Vector3 initialPos)
 
 //    Node *vehicleNode = GetScene()->CreateChild("Vehicle", LOCAL);
 
-    raycastVehicle_ = node_->CreateComponent<RaycastVehicle>(LOCAL);
+    raycastVehicle_ = node_->CreateComponent<RaycastVehicle>(REPLICATED);
     raycastVehicle_->SetEnabled(true);
     raycastVehicle_->GetNode()->SetPosition(initialPos);
 
-    hullColShape_ = node_->CreateComponent<CollisionShape>(LOCAL);
-    hullObject_ = node_->CreateComponent<StaticModel>(LOCAL);
+    hullColShape_ = node_->CreateComponent<CollisionShape>(REPLICATED);
+    hullObject_ = node_->CreateComponent<StaticModel>(REPLICATED);
 
 //    raycastVehicle_->GetNode()->SetScale(3.0f);
 
@@ -348,7 +348,7 @@ void Vehicle::Init(bool isServer, Vector3 initialPos)
             Quaternion qRot = raycastVehicle_->GetWheelRotation(i);
 
             // wheel node
-            Node *wheelNode = GetScene()->CreateChild("wheel", LOCAL);
+            Node *wheelNode = GetScene()->CreateChild("wheel", REPLICATED);
             m_vpNodeWheel.Push( wheelNode );
 
             wheelNode->SetPosition( v3Origin );
@@ -361,11 +361,11 @@ void Vehicle::Init(bool isServer, Vector3 initialPos)
             //wheelThickness = 1.0f
             wheelNode->SetScale(Vector3(tireScaleXZ,wheelThickness,tireScaleXZ));
 
-            Node* adjNode = wheelNode->CreateChild("AdjNode", LOCAL);
+            Node* adjNode = wheelNode->CreateChild("AdjNode", REPLICATED);
             adjNode->SetRotation(Quaternion(0.0, 0.0, -90.0f));
 
             // tire model
-            StaticModel *pWheel = adjNode->CreateComponent<StaticModel>(LOCAL);
+            StaticModel *pWheel = adjNode->CreateComponent<StaticModel>(REPLICATED);
             //pWheel->GetNode()->SetScale(0.4f);
             pWheel->SetModel(tireModel);
             pWheel->ApplyMaterialList("Models/Vehicles/Offroad/Models/wheel-fl.txt");
@@ -376,7 +376,7 @@ void Vehicle::Init(bool isServer, Vector3 initialPos)
 
 
             // track
-            Node *trackNode = GetScene()->CreateChild("track", LOCAL);
+            Node *trackNode = GetScene()->CreateChild("track", REPLICATED);
             wheelTrackList_[i] = trackNode->CreateComponent<WheelTrackModel>();
             wheelTrackList_[i]->SetModel(trackModel->Clone());
             wheelTrackList_[i]->SetMaterial(cache->GetResource<Material>("Offroad/Models/Materials/TireTrack.xml"));
@@ -387,7 +387,7 @@ void Vehicle::Init(bool isServer, Vector3 initialPos)
             wheelTrackList_[i]->ValidateBufferElements();
 
             // particle emitter
-            Node *pNodeEmitter = GetScene()->CreateChild("particleEmitter", LOCAL);
+            Node *pNodeEmitter = GetScene()->CreateChild("particleEmitter", REPLICATED);
             Vector3 emitPos = v3Origin + Vector3(0,-m_fwheelRadius,0);
             pNodeEmitter->SetPosition( emitPos );
             ParticleEmitter* particleEmitter = pNodeEmitter->CreateComponent<ParticleEmitter>();
