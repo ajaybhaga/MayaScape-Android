@@ -81,7 +81,7 @@ public:
 
     void InitializeScene(File &file);
 
-    void CreatePlayer(Connection* connection);
+    Node* CreatePlayer(Connection* connection);
     void DestroyPlayer(Connection* connection);
 
     Node* CreateClientObject(Connection *connection);

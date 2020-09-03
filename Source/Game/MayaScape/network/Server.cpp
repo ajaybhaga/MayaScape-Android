@@ -135,7 +135,7 @@ Node* Server::CreateClientObject(Connection *connection)
 }
 
 
-void Server::CreatePlayer(Connection* connection) {
+Node* Server::CreatePlayer(Connection* connection) {
     Node *playerNode = scene_->CreateChild("Player", REPLICATED);
 
     // Place on track
@@ -170,6 +170,7 @@ void Server::CreatePlayer(Connection* connection) {
     // Assign player node to csp snapshot
     csp->add_node(playerNode);*/
 
+    return playerNode;
 }
 
 void Server::SubscribeToEvents()
@@ -293,7 +294,7 @@ void Server::SendPlayerStateMsg(Connection* connection)
 
         // Send the event forward
         VariantMap &newEventData = GetEventDataMap();
-        newEventData[P_ID] = actor->GetID();
+        newEventData[P_ID] = actor->GetVehicle()->GetID();
         newEventData[P_LIFE] = actor->GetLife();
         if (actor->GetVehicle()) {
             newEventData[P_RPM] = actor->GetVehicle()->GetCurrentRPM();
@@ -322,10 +323,9 @@ void Server::HandleClientIdentity(StringHash eventType, VariantMap& eventData)
 
     // Then create a controllable object for that client
     Node* clientObject = CreateClientObject(newConnection);
-    serverObjects_[newConnection] = clientObject;
-
     // Create player for new client
     CreatePlayer(newConnection);
+    serverObjects_[newConnection] = clientObject;
 
     // Output the updated login list
     OutputLoginListToConsole();
