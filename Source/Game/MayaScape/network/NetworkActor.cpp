@@ -109,10 +109,6 @@ void NetworkActor::Create() {
     if (!userName_.Empty()) {
         ResourceCache *cache = GetSubsystem<ResourceCache>();
 
-        Node *adjNode = GetScene()->CreateChild("AdjNode", REPLICATED);
-        adjNode->SetRotation(Quaternion(0.0, 0.0, -90.0f));
-
-
         // Init vehicle
         Node *vehicleNode = GetScene()->CreateChild("Vehicle", REPLICATED);
 

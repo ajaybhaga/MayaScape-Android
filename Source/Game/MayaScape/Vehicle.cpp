@@ -199,8 +199,8 @@ void Vehicle::Init(bool isServer, Vector3 initialPos)
     SubscribeToEvent(GetNode(), E_NODECOLLISION, URHO3D_HANDLER(Vehicle, HandleVehicleCollision));
 
 //E_NODECOLLISIONSTART
-    Node* adjNode = node_->CreateChild("AdjNode", REPLICATED);
-    adjNode->SetRotation(Quaternion(0.0, 0.0, -90.0f));
+    //Node* adjNode = node_->CreateChild("AdjNode", REPLICATED);
+    //adjNode->SetRotation(Quaternion(0.0, 0.0, -90.0f));
 
     node_->SetPosition(initialPos);
 
@@ -376,7 +376,7 @@ void Vehicle::Init(bool isServer, Vector3 initialPos)
 
 
             // track
-            Node *trackNode = GetScene()->CreateChild("track", REPLICATED);
+            Node *trackNode = GetScene()->CreateChild("track", LOCAL);
             wheelTrackList_[i] = trackNode->CreateComponent<WheelTrackModel>();
             wheelTrackList_[i]->SetModel(trackModel->Clone());
             wheelTrackList_[i]->SetMaterial(cache->GetResource<Material>("Offroad/Models/Materials/TireTrack.xml"));
@@ -387,7 +387,7 @@ void Vehicle::Init(bool isServer, Vector3 initialPos)
             wheelTrackList_[i]->ValidateBufferElements();
 
             // particle emitter
-            Node *pNodeEmitter = GetScene()->CreateChild("particleEmitter", REPLICATED);
+            Node *pNodeEmitter = GetScene()->CreateChild("particleEmitter", LOCAL);
             Vector3 emitPos = v3Origin + Vector3(0,-m_fwheelRadius,0);
             pNodeEmitter->SetPosition( emitPos );
             ParticleEmitter* particleEmitter = pNodeEmitter->CreateComponent<ParticleEmitter>();

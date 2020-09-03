@@ -299,7 +299,7 @@ void Server::SendPlayerStateMsg(Connection* connection)
             newEventData[P_VELOCITY] = actor->GetVehicle()->GetSpeedKmH();
             newEventData[P_STEER] = actor->GetVehicle()->GetSteering();
         }
-        SendEvent(E_SERVERSTATUS, newEventData);
+        SendEvent(E_PLAYERSTATE, newEventData);
     }
 }
 
