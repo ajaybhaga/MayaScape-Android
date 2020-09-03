@@ -1543,50 +1543,8 @@ void MayaScape::HandleRenderUpdate(StringHash eventType, VariantMap &eventData) 
     float zoom_ = cameraNode_->GetComponent<Camera>()->GetZoom();
     float deltaSum;
 
-
-    if (player_) {
-
-//        Vector3 targetAgent = agents_[player_->targetAgentIndex_]->GetVehicle()->GetNode()->GetPosition();
-
-
-        /*
-            // Determine zoom by getting average distance from all players
-            for (int i = 0; i < EvolutionManager::getInstance()->getAgents().size(); i++) {
-
-                // Update player location for AI
-                agents_[i]->playerPos_ = player_->GetNode()->GetPosition();
-
-                Vector3 p1 = player_->GetNode()->GetPosition();
-                p1.z_ = 0;
-                Vector3 p2 = agents_[i]->GetNode()->GetPosition();
-                p2.z_ = 0;
-                float delta = p1.DistanceToPoint(p2);
-                deltaSum += delta;
-            }
-
-            float avgDelta = ((float) deltaSum) / ((float) EvolutionManager::getInstance()->getAgents().size());
-            float factor;
-
-            if (avgDelta > 5.0f) {
-                factor = 1.0f - avgDelta * 0.02f;
-            } else {
-                factor = 1.0f + avgDelta * 0.02f;
-            }
-
-            factor = 1.0f;
-
-            zoom_ = Clamp(zoom_ * factor, CAMERA_MIN_DIST, CAMERA_MAX_DIST);
-            cameraNode_->GetComponent<Camera>()->SetZoom(zoom_);
-
-       */
-    }
-
     //    URHO3D_LOGINFOF("delta=%f", delta);
     //    URHO3D_LOGINFOF("factor=%f", factor);
-
-
-    // Clamp focus index
-    focusIndex_ = focusIndex_ % focusObjects_.Size();
 
     if (player_) {
 
@@ -1703,6 +1661,12 @@ void MayaScape::HandleRenderUpdate(StringHash eventType, VariantMap &eventData) 
          */
 
     }
+    Variant lStick = ntwkControls_.extraData_[VAR_AXIS_0];
+    Vector2 lAxisVal = lStick.GetVector2();
+    float steering = lStick.GetVector2().x_ * 0.25f;
+    //    Quaternion vRot = vehicle_->GetNode()->GetRotation();
+
+    steerWheelSprite_->SetRotation(360.0f * steering);
 
 
     int life = 100;
@@ -1747,6 +1711,8 @@ void MayaScape::HandleRenderUpdate(StringHash eventType, VariantMap &eventData) 
 
 //    float maxX = terrain_->GetHeightMap()->GetWidth()*terrain_->GetPatchSize();
 //    float maxY = terrain_->GetHeightMap()->GetHeight()*terrain_->GetPatchSize();
+
+
 
         // Only show once vehicle is activated
         if (player_->GetVehicle()->GetNode()) {
@@ -1797,10 +1763,8 @@ void MayaScape::HandleRenderUpdate(StringHash eventType, VariantMap &eventData) 
             miniMapWPSprite_->SetPosition(Vector2(miniMapWPX - xRange, miniMapWPY - zRange));
             //    miniMapWPSprite_->SetRotation(vehicleRot_.YawAngle());
 
-            float steering = player_->GetVehicle()->GetSteering();
-            //    Quaternion vRot = vehicle_->GetNode()->GetRotation();
 
-            steerWheelSprite_->SetRotation(360.0f * steering);
+
 
             /* DISABLED HEADLAMP RENABLE AFTER UPDATE
              player_->GetVehicleHeadLamp()->SetPosition(Vector3(player_->GetVehicle()->GetNode()->GetPosition().x_,
@@ -2204,8 +2168,10 @@ void MayaScape::HandleUpdate(StringHash eventType, VariantMap &eventData) {
         focusIndex_++;
     }
 
-    // Clamp focus index
-    focusIndex_ = focusIndex_ % focusObjects_.Size();
+    if (!focusObjects_.Empty()) {
+        // Clamp focus index
+        focusIndex_ = focusIndex_ % focusObjects_.Size();
+    }
 
     // Check for loading / saving the scene
     if (input->GetKeyPress(KEY_F5))
@@ -2326,10 +2292,9 @@ void MayaScape::HandleUpdate(StringHash eventType, VariantMap &eventData) {
     }
 #endif
 
-    if (!isServer_) {
-        // Call our render update
-        HandleRenderUpdate(eventType, eventData);
-    }
+    // Call our render update
+    HandleRenderUpdate(eventType, eventData);
+
 }
 
 void MayaScape::HandlePostUpdate(StringHash eventType, VariantMap &eventData) {
@@ -3069,7 +3034,7 @@ void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
                 if (scene_->GetComponent<PhysicsWorld>()) {
 
                     scene_->GetComponent<PhysicsWorld>()->RaycastSingle(result, cameraRay, cameraRayLength,
-                                                                        NETWORKACTOR_COL_LAYER);
+                                                                        NETWORKACTOR_COL_LAYER);yr
                     if (result.body_)
                         cameraTargetPos = cameraStartPos + cameraRay.direction_ * (result.distance_ - 0.5f);
                 }
@@ -3129,19 +3094,44 @@ void MayaScape::HandlePhysicsPreStep(StringHash eventType, VariantMap &eventData
             if (actorNode) {
                 // Controllable client network actor (replicated from server based on client controls)
 
+
+                // axis
+                const StringHash axisHashList[SDL_CONTROLLER_AXIS_MAX/2] = { VAR_AXIS_0, VAR_AXIS_1, VAR_AXIS_2 };
+                // left stick - vehicle
+                Variant lStick = ntwkControls_.extraData_[VAR_AXIS_0];
+                Vector2 lAxisVal = lStick.GetVector2();
+
+                // right stick
+                Variant rStick = ntwkControls_.extraData_[VAR_AXIS_1];
+                Vector2 rAxisVal = rStick.GetVector2();
+
+                bool snap = false;
+                ntwkControls_.Set(NTWK_CTRL_LEFT, 0);
+                ntwkControls_.Set(NTWK_CTRL_RIGHT, 0);
+                if (lAxisVal.x_ < -0.4f) {
+                    // left
+                    ntwkControls_.Set(NTWK_CTRL_LEFT, 1);
+                    snap = true;
+                } else if (lAxisVal.x_ > 0.4f) {
+                    // right
+                    ntwkControls_.Set(NTWK_CTRL_RIGHT, 1);
+                    snap = true;
+                }
+
+
                 for (int i = 0; i < hudTextList_.Size(); i++) {
                     switch (i) {
                         case 0:
-                            hudText = "network control: " + String(ntwkControls_.buttons_);
+                            hudText = "Button state: " + String(ntwkControls_.buttons_);
                             break;
                         case 1:
-                            hudText = "h2: actor pos(x,y,z) = " + String(actorNode->GetPosition());
+                            hudText = "L axis: " + String(lAxisVal);
                             break;
                         case 2:
-                            hudText = "h3: actor pos(x,y,z) = " + String(actorNode->GetPosition());
+                            hudText = "R axis: " + String(rAxisVal);
                             break;
                         case 3:
-                            hudText = "h4: actor pos(x,y,z) = " + String(actorNode->GetPosition());
+                            hudText = "snap = " + String(snap);
                             break;
                     }
 
