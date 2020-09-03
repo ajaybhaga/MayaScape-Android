@@ -299,7 +299,10 @@ void Server::SendPlayerStateMsg(Connection* connection)
             newEventData[P_VELOCITY] = actor->GetVehicle()->GetSpeedKmH();
             newEventData[P_STEER] = actor->GetVehicle()->GetSteering();
         }
-        SendEvent(E_PLAYERSTATE, newEventData);
+        //SendEvent(E_PLAYERSTATE, newEventData);
+        // Finally send the object's node ID using a remote event
+        connection->SendRemoteEvent(E_PLAYERSTATE, true, newEventData);
+
     }
 }
 
