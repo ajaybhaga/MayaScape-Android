@@ -1386,26 +1386,13 @@ void MayaScape::SubscribeToEvents() {
     // Subscribe to player state events
     SubscribeToEvent(E_PLAYERSTATE, URHO3D_HANDLER(MayaScape, HandlePlayerStateUpdate));
 
-
-/*
- *     SubscribeToEvent(E_SERVERCONNECTED, URHO3D_HANDLER(Chat, HandleConnectionStatus));
-    SubscribeToEvent(E_SERVERDISCONNECTED, URHO3D_HANDLER(Chat, HandleConnectionStatus));
-    SubscribeToEvent(E_CONNECTFAILED, URHO3D_HANDLER(Chat, HandleConnectionStatus));
-
- *
- */
-
+    // Events sent between client & server (remote events) must be explicitly registered or else they are not allowed to be received
+    GetSubsystem<Network>()->RegisterRemoteEvent(E_PLAYERSTATE);
 
     SubscribeToEvent(E_CLIENTOBJECTID, URHO3D_HANDLER(MayaScape, HandleClientObjectID));
 
     // Events sent between client & server (remote events) must be explicitly registered or else they are not allowed to be received
     GetSubsystem<Network>()->RegisterRemoteEvent(E_CLIENTOBJECTID);
-
-//    SubscribeToEvent(E_CLIENTOBJECTID, URHO3D_HANDLER(MayaScape, HandleClientObjectID));
-
-//    SubscribeToEvent(E_CLIENTSCENELOADED, URHO3D_HANDLER(MayaScape, HandleClientSceneLoaded));
-
-//    SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(MyApp, HandleKeyDown));
 
     // Subscribe function for processing update events
     SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(MayaScape, HandleUpdate));
@@ -1455,6 +1442,8 @@ void MayaScape::HandleNodeCollision(StringHash eventType, VariantMap& eventData)
 void MayaScape::HandlePlayerStateUpdate(StringHash eventType, VariantMap& eventData) {
 
     URHO3D_LOGINFO("Client -> HandlePlayerStateUpdate");
+
+
 }
 
 
@@ -2255,30 +2244,40 @@ void MayaScape::HandlePostUpdate(StringHash eventType, VariantMap &eventData) {
     cameraNode_->SetPosition(cameraTargetPos);
     cameraNode_->SetRotation(dir);*/
 
-    Node *actorNode = nullptr;
-    actorNode = scene_->GetNode(clientObjectID_);
-    // Update player node
-    player_ = static_cast<SharedPtr<Node>>(actorNode);
-    using namespace Update;
-    float timeStep = eventData[P_TIMESTEP].GetFloat();
 
-    if (actorNode) {
+    if (started_) {
+        Node *actorNode = nullptr;
 
-        // Apply transformations to camera
-        MoveCamera(actorNode, timeStep);
+        actorNode = scene_->GetNode(clientObjectID_);
 
-        instructionsText_->SetVisible(true);
+        using namespace Update;
+        float timeStep = eventData[P_TIMESTEP].GetFloat();
 
-        for (int i = 0; i < hudTextList_.Size(); i++) {
-            hudTextList_[i]->SetVisible(true);
+        if (actorNode) {
+            // Update player node
+            player_ = static_cast<SharedPtr<Node>>(actorNode);
+
+            // Apply transformations to camera
+            MoveCamera(actorNode, timeStep);
+
+            instructionsText_->SetVisible(true);
+
+            for (int i = 0; i < hudTextList_.Size(); i++) {
+                hudTextList_[i]->SetVisible(true);
+            }
+
+        } else {
+            // For server
+            if (isServer_) {
+                // Apply transformations to camera
+                MoveCamera(actorNode, timeStep);
+            } else {
+                // For client, could not get controllable network actor
+
+                int a;
+                a = 1;
+            }
         }
-
-    } else {
-        // Server
-
-        // Apply transformations to camera
-        MoveCamera(actorNode, timeStep);
-
     }
 
 }
@@ -2707,8 +2706,14 @@ void MayaScape::SetAerialCamera() {
 }
 
 void MayaScape::SetAerialCamera(const Vector3& target) {
+
+    Vector3 tgt;
+    tgt = target;
+    if (target.Equals(Vector3::ZERO)) {
+        tgt = Vector3(0.0f, 90.0f, 0.0f);
+    }
     // Apply camera transformations
-    cameraNode_->SetPosition(Vector3(target.x_, terrain_->GetHeight(target)+80.0f, target.z_));
+    cameraNode_->SetPosition(Vector3(tgt.x_, tgt.y_+0.3f, tgt.z_));
     cameraNode_->SetRotation(Quaternion(90.0f, 0.0f, 0.0f));
 }
 
@@ -2741,7 +2746,7 @@ void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
 
             // Only move the camera / show instructions if we have a controllable object
             bool showInstructions = false;
-            if (clientObjectID_) {
+            if (clientObjectID_ != 0) {
 
                 //URHO3D_LOGINFOF("--- Found controllable object: %u", clientObjectID_);
 
@@ -2761,7 +2766,7 @@ void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
 
                     Quaternion dir = Quaternion(0, 0, 90);
 
-                    targetCameraPos_ = startPos + Vector3(0, 30.0f, CAMERA_DISTANCE);
+                    targetCameraPos_ = startPos + Vector3(0, 5.0f, CAMERA_DISTANCE);
                     // Calculate ray based on focus object
 //                    float curDist = (focusObjects_[focusIndex_] - targetCameraPos_).Length();
                     float curDist = (actorNode->GetPosition() - targetCameraPos_).Length();
@@ -2962,7 +2967,7 @@ void MayaScape::HandlePhysicsPreStep(StringHash eventType, VariantMap &eventData
         Node *actorNode = nullptr;
         String hudText = "";
 
-        if (clientObjectID_) {
+        if (clientObjectID_ != 0) {
             actorNode = scene_->GetNode(clientObjectID_);
 
             if (actorNode) {
@@ -3298,20 +3303,6 @@ void MayaScape::HandleClientObjectID(StringHash eventType, VariantMap &eventData
 
         URHO3D_LOGINFOF("Client -> sent node error message: %s", msg.GetData());
     }
-
-    Node *actorNode = nullptr;
-    actorNode = scene_->GetNode(clientObjectID_);
-
-    if (actorNode) {
-//        actorNode->SetPosition()
-//        URHO3D_LOGINFOF("Client -> actorNode: %d", actorNode->GetID());
-
-        using namespace Update;
-        float timeStep = eventData[P_TIMESTEP].GetFloat();
-
-        // Apply transformations to camera
-        //MoveCamera(actorNode, timeStep);
-    }
 }
 
 
@@ -3432,7 +3423,7 @@ void MayaScape::HandleNetworkMessage(StringHash /*eventType*/, VariantMap &event
 
     int msgID = eventData[P_MESSAGEID].GetInt();
 
-//    URHO3D_LOGINFOF("HandleNetworkMessage: msgID -> %d", msgID);
+    URHO3D_LOGINFOF("HandleNetworkMessage: msgID -> %d", msgID);
 
     if (msgID == MSG_NODE_ERROR) {
         // Client cannot get Network Actor, resend
