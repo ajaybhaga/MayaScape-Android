@@ -56,10 +56,11 @@ URHO3D_EVENT(E_CLIENTOBJECTID, ClientObjectID)
 
 URHO3D_EVENT(E_PLAYERSTATE, ClientPlayerState)
 {
+    URHO3D_PARAM(P_ID, ID);         // unsigned
     URHO3D_PARAM(P_LIFE, Life);         // unsigned
-    URHO3D_PARAM(P_RPM, RPM);         // unsigned
-    URHO3D_PARAM(P_VELOCITY, Velocity);         // unsigned
-    URHO3D_PARAM(P_STEER, Steering);         // unsigned
+    URHO3D_PARAM(P_RPM, RPM);         // float
+    URHO3D_PARAM(P_VELOCITY, Velocity);     // float
+    URHO3D_PARAM(P_STEER, Steering);         // float
 }
 
 
