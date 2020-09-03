@@ -334,7 +334,8 @@ private:
     SharedPtr<Text> instructionsText_;
     Vector<SharedPtr<Text>> hudTextList_;
 
-    unsigned clientObjectID_;
+    unsigned loginClientObjectID_; // Login client node id
+    unsigned playerObjectID_; // Player object node id
     bool isServer_;
 
 

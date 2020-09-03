@@ -183,7 +183,7 @@ URHO3D_DEFINE_APPLICATION_MAIN(MayaScape)
 
 MayaScape::MayaScape(Context *context) :
         Game(context),
-        clientObjectID_(0),
+        loginClientObjectID_(0),
         isServer_(false),
         drawDebug_(false), csp_client(context) {
 
@@ -1449,9 +1449,9 @@ void MayaScape::HandlePlayerStateUpdate(StringHash eventType, VariantMap& eventD
     float steer = eventData[P_STEER].GetFloat();
 
     // Store updated node id
-    clientObjectID_ = id;
+    playerObjectID_ = id;
 
-    //URHO3D_LOGINFOF("Client -> HandlePlayerStateUpdate: %d, %d, %f, %f, %f", id, life, rpm, velocity, steer);
+    URHO3D_LOGINFOF("Client -> HandlePlayerStateUpdate: %d, %d, %f, %f, %f", id, life, rpm, velocity, steer);
 }
 
 
@@ -2256,7 +2256,7 @@ void MayaScape::HandlePostUpdate(StringHash eventType, VariantMap &eventData) {
     if (started_) {
         Node *actorNode = nullptr;
 
-        actorNode = scene_->GetNode(clientObjectID_);
+        actorNode = scene_->GetNode(playerObjectID_);
 
         using namespace Update;
         float timeStep = eventData[P_TIMESTEP].GetFloat();
@@ -2281,9 +2281,7 @@ void MayaScape::HandlePostUpdate(StringHash eventType, VariantMap &eventData) {
                 MoveCamera(actorNode, timeStep);
             } else {
                 // For client, could not get controllable network actor
-
-                int a;
-                a = 1;
+                // This should resolve in a a few cycles
             }
         }
     }
@@ -2721,7 +2719,7 @@ void MayaScape::SetAerialCamera(const Vector3& target) {
         tgt = Vector3(0.0f, 90.0f, 0.0f);
     }
     // Apply camera transformations
-    cameraNode_->SetPosition(Vector3(tgt.x_, tgt.y_+0.3f, tgt.z_));
+    cameraNode_->SetPosition(Vector3(tgt.x_, tgt.y_+2.0f, tgt.z_));
     cameraNode_->SetRotation(Quaternion(90.0f, 0.0f, 0.0f));
 }
 
@@ -2754,7 +2752,9 @@ void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
 
             // Only move the camera / show instructions if we have a controllable object
             bool showInstructions = false;
-            if (clientObjectID_ != 0) {
+            if (playerObjectID_ != 0) {
+
+                actorNode = scene_->GetNode(playerObjectID_);
 
                 //URHO3D_LOGINFOF("--- Found controllable object: %u", clientObjectID_);
 
@@ -2763,7 +2763,7 @@ void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
                     const float CAMERA_DISTANCE = 8.0f;
 
                     Vector3 startPos = actorNode->GetPosition();
-                    URHO3D_LOGINFOF("--- Found controllable object -> position: [%f, %f, %f] ", actorNode->GetPosition().x_, actorNode->GetPosition().y_, actorNode->GetPosition().z_);
+                    URHO3D_LOGINFOF("--- Found controllable object -> position: %d [%f, %f, %f] ", playerObjectID_, actorNode->GetPosition().x_, actorNode->GetPosition().y_, actorNode->GetPosition().z_);
 
                     // Snap camera to vehicle once available
 
@@ -2975,8 +2975,8 @@ void MayaScape::HandlePhysicsPreStep(StringHash eventType, VariantMap &eventData
         Node *actorNode = nullptr;
         String hudText = "";
 
-        if (clientObjectID_ != 0) {
-            actorNode = scene_->GetNode(clientObjectID_);
+        if (playerObjectID_ != 0) {
+            actorNode = scene_->GetNode(playerObjectID_);
 
             if (actorNode) {
                 // Controllable client network actor (replicated from server based on client controls)
@@ -3290,9 +3290,9 @@ void MayaScape::HandleClientObjectID(StringHash eventType, VariantMap &eventData
     URHO3D_LOGINFO("*** HandleClientObjectID");
 
     // Client stores client object id
-    clientObjectID_ = eventData[ClientObjectID::P_ID].GetUInt();
+    loginClientObjectID_ = eventData[ClientObjectID::P_ID].GetUInt();
 
-    URHO3D_LOGINFOF("Client -> HandleClientObjectID: %u", clientObjectID_);
+    URHO3D_LOGINFOF("Client -> HandleClientObjectID: %u", loginClientObjectID_);
 
     URHO3D_LOGINFOF("Client -> scene checksum: %d", ToStringHex(scene_->GetChecksum()).CString());
 
