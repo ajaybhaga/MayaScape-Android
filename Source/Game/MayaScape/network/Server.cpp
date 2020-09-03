@@ -215,6 +215,9 @@ void Server::UpdateActors(float timeStep) {
                 if (actor->vehicle_)
                     actor->GetNode()->SetPosition(actor->vehicle_->GetNode()->GetPosition());
 
+
+                SendPlayerStateMsg(connection);
+
                 // Mark actor to update on network for replicate nodes
                 actor->MarkNetworkUpdate();
             }
@@ -279,6 +282,25 @@ void Server::SendStatusMsg(StringHash msg)
     VariantMap& newEventData = GetEventDataMap();
     newEventData[P_STATUS] = msg;
     SendEvent(E_SERVERSTATUS, newEventData);
+}
+
+
+void Server::SendPlayerStateMsg(Connection* connection)
+{
+    NetworkActor* actor = actorMap_[connection];
+    if (actor) {
+        using namespace ClientPlayerState;
+
+        // Send the event forward
+        VariantMap &newEventData = GetEventDataMap();
+        newEventData[P_LIFE] = actor->GetLife();
+        if (actor->GetVehicle()) {
+            newEventData[P_RPM] = actor->GetVehicle()->GetCurrentRPM();
+            newEventData[P_VELOCITY] = actor->GetVehicle()->GetSpeedKmH();
+            newEventData[P_STEER] = actor->GetVehicle()->GetSteering();
+        }
+        SendEvent(E_SERVERSTATUS, newEventData);
+    }
 }
 
 void Server::HandleClientIdentity(StringHash eventType, VariantMap& eventData)

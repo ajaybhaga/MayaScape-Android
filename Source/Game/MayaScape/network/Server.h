@@ -54,6 +54,15 @@ URHO3D_EVENT(E_CLIENTOBJECTID, ClientObjectID)
 	URHO3D_PARAM(P_ID, ID);         // unsigned
 }
 
+URHO3D_EVENT(E_PLAYERSTATE, ClientPlayerState)
+{
+    URHO3D_PARAM(P_LIFE, Life);         // unsigned
+    URHO3D_PARAM(P_RPM, RPM);         // unsigned
+    URHO3D_PARAM(P_VELOCITY, Velocity);         // unsigned
+    URHO3D_PARAM(P_STEER, Steering);         // unsigned
+}
+
+
 //=============================================================================
 //=============================================================================
 class Server : public Object
@@ -82,6 +91,7 @@ public:
 protected:
     void SubscribeToEvents();
     void SendStatusMsg(StringHash msg);
+    void SendPlayerStateMsg(Connection* connection);
 
     /// Handle the physics world pre-step event.
     void HandlePhysicsPreStep(StringHash eventType, VariantMap& eventData);

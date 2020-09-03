@@ -209,7 +209,10 @@ private:
     void OutputLoginListToConsole();
 
     void HandleClientSceneLoaded(StringHash eventType, VariantMap& eventData);
+    void HandlePlayerStateUpdate(StringHash eventType, VariantMap& eventData);
+
     String SaveScene(bool initial);
+
 
     Controls sample_input();
     void apply_input(Node* playerNode, const Controls& controls);
@@ -224,7 +227,7 @@ private:
 
     SharedPtr<Window> msgWindow_;
 
-    SharedPtr<NetworkActor> player_; // This player
+    SharedPtr<Node> player_; // This player
     SharedPtr<NetworkActor> agents_[MAX_AGENTS]; // Agents
 
     CSP_Client csp_client;

@@ -1382,6 +1382,11 @@ void MayaScape::SubscribeToEvents() {
 
     // Subscribe to server events
     SubscribeToEvent(E_SERVERSTATUS, URHO3D_HANDLER(MayaScape, HandleConnectionStatus));
+
+    // Subscribe to player state events
+    SubscribeToEvent(E_PLAYERSTATE, URHO3D_HANDLER(MayaScape, HandlePlayerStateUpdate));
+
+
 /*
  *     SubscribeToEvent(E_SERVERCONNECTED, URHO3D_HANDLER(Chat, HandleConnectionStatus));
     SubscribeToEvent(E_SERVERDISCONNECTED, URHO3D_HANDLER(Chat, HandleConnectionStatus));
@@ -1446,6 +1451,12 @@ void MayaScape::HandleNodeCollision(StringHash eventType, VariantMap& eventData)
         std::cout << std::endl;
 
 }*/
+
+void MayaScape::HandlePlayerStateUpdate(StringHash eventType, VariantMap& eventData) {
+
+    URHO3D_LOGINFO("Client -> HandlePlayerStateUpdate");
+}
+
 
 void MayaScape::HandleCollisionBegin(StringHash eventType, VariantMap &eventData) {
     // Get colliding node
@@ -1671,14 +1682,14 @@ void MayaScape::HandleRenderUpdate(StringHash eventType, VariantMap &eventData) 
 
     int life = 100;
     if (player_) {
-        life = player_->GetLife();
+        life = 0;//player_->GetLife();
         // Update player powerbar
         IntVector2 v = powerBarBkgP1Sprite_->GetSize();
         int power = int(((life) / 100.0f) * (float) v.x_);
         powerBarP1Sprite_->SetSize(power, v.y_);
 
         float maxRPM = 8000.0f;
-        float clampedRPM = player_->GetVehicle()->GetCurrentRPM();
+        float clampedRPM = 0;//player_->GetVehicle()->GetCurrentRPM();
         if (clampedRPM > maxRPM) {
             clampedRPM = maxRPM;
         }
@@ -1689,7 +1700,7 @@ void MayaScape::HandleRenderUpdate(StringHash eventType, VariantMap &eventData) 
 
 
         float maxSpeed = 220.0f;
-        float clampedSpeed = player_->GetVehicle()->GetSpeedKmH();
+        float clampedSpeed = 0;//player_->GetVehicle()->GetSpeedKmH();
         if (clampedSpeed > maxSpeed) {
             clampedSpeed = maxSpeed;
         }
@@ -1715,10 +1726,10 @@ void MayaScape::HandleRenderUpdate(StringHash eventType, VariantMap &eventData) 
 
 
         // Only show once vehicle is activated
-        if (player_->GetVehicle()->GetNode()) {
+        if (player_) {
             // Calculate mini map position
             Vector3 shiftedRange =
-                    player_->GetVehicle()->GetNode()->GetPosition() + Vector3(mapSize / 2, mapSize / 2, mapSize / 2);
+                    player_->GetPosition() + Vector3(mapSize / 2, mapSize / 2, mapSize / 2);
 
             // 1600+1600
             float xRange = (shiftedRange.x_ / mapSize) * miniMapWidth;
@@ -1736,7 +1747,7 @@ void MayaScape::HandleRenderUpdate(StringHash eventType, VariantMap &eventData) 
             float wpOffsetX = -mapSize / 2;
             float wpOffsetY = -mapSize / 2;
 
-            int index = player_->wpActiveIndex_;
+            int index = 0;//player_->wpActiveIndex_;
 
             if (index < 0) index = 0;
             // Convert marker position to world position for waypoint
@@ -1789,7 +1800,7 @@ void MayaScape::HandleRenderUpdate(StringHash eventType, VariantMap &eventData) 
              //   light->SetShadowBias(BiasParameters(0.00025f, 0.5f));
      */
             // Update focus objects
-            focusObjects_[0] = player_->GetVehicle()->GetNode()->GetPosition(); // Vehicle
+//            focusObjects_[0] = player_->GetVehicle()->GetNode()->GetPosition(); // Vehicle
         }
 
         int i = 0;
@@ -1797,97 +1808,6 @@ void MayaScape::HandleRenderUpdate(StringHash eventType, VariantMap &eventData) 
         //URHO3D_LOGINFOF("player_ position x=%f, y=%f, z=%f", player_->GetNode()->GetPosition().x_, player_->GetNode()->GetPosition().y_, player_->GetNode()->GetPosition().z_);
 
         //
-
-        using namespace Update;
-
-        if (player_->GetVehicle()) {
-
-            i++;
-
-/*
-        if (terrain_->GetMarkerMap()) {
-            //float vx = xRange; // vehicle pos
-            //float vz = zRange;
-            // 1600+1600
-            int vx = (shiftedRange.x_ / mapSize) * terrain_->GetMarkerMap()->GetWidth();
-            int vz = (shiftedRange.z_ / mapSize) * terrain_->GetMarkerMap()->GetHeight();
-
-            Vector3 hsl_ = terrain_->GetMarkerMap()->GetPixel(vx, vz).ToHSL();
-
-            sprintf(str, "pixel [%d,%d] -> (%f, %f, %f)", vx, vz, hsl_.x_, hsl_.y_, hsl_.z_);
-            playerInfo.clear();
-            playerInfo.append("Vehicle (x,z) -> ").append(str);
-//            debugText_[i]->SetText(playerInfo.c_str());
-            i++;
-            sprintf(str, "height [%d,%d] -> %d", vx, vz, terrain_->GetHeightMap()->GetPixel(vx, vz).ToUInt());
-            playerInfo.clear();
-            playerInfo.append("Vehicle (x,z) -> ").append(str);
-//            debugText_[i]->SetText(playerInfo.c_str());
-            i++;
-
-        }
-*/
-            /*
-            i++;
-            playerInfo.clear();
-            sprintf(str, "vehicle pos (%f, %f, %f, %f, gauge = %f)", vehicle_->GetNode()->GetPosition().x_, vehicle_->GetNode()->GetPosition().y_, vehicle_->GetNode()->GetPosition().z_, (vehicle_->GetCurrentRPM()), (vehicle_->GetCurrentRPM()/7000.0f)*100.0f);
-            playerInfo.append("-> ").append(str);
-            debugText_[i]->SetText(playerInfo.c_str());
-            i++;
-            playerInfo.clear();
-    */
-/*
-        // speed
-        char buff[20];
-
-        if (1)
-        {
-            float spd = player_->GetVehicle()->GetSpeedKmH();
-            if (spd<0.0f) spd = 0.0f;
-            sprintf(buff, "%.0f KmH", spd);
-        }
-        else
-        {
-            float spd = player_->GetVehicle()->GetSpeedMPH();
-            if (spd<0.0f) spd = 0.0f;
-            sprintf(buff, "%.0f MPH", spd);
-        }
-        String data(buff);
-        int gear = player_->GetVehicle()->GetCurrentGear() + 1;
-        data += String("\ngear: ") + String(gear);
-        float rpm = player_->GetVehicle()->GetCurrentRPM();
-        sprintf(buff, ", %.0f RPM", rpm);
-        data += String(buff);
-
-        float acc = player_->GetVehicle()->GetAcceleration();
-        sprintf(buff, ", %.0f Acc", acc);
-        data += String(buff);
-
-        float angvel = player_->GetVehicle()->GetAngularVelocity();
-        sprintf(buff, ", %.0f Angular Velocity", angvel);
-        data += String(buff);
-*/
-            // vehicle_->DebugDraw(Color(1.0, 0.0, 1.0));
-
-            // sprintf(buff, ", %.0f RPM", rpm);
-            // data += String(buff);
-
-            //        textKmH_->SetText( data );
-
-/*
-        sprintf(str, "%.2f -> Gauge %.2f", vehicle_->GetCurrentRPM(), vehicle_->GetCurrentRPM()/7000.0f);
-        playerInfo.append("Vehicle [engine rpm] -> ").append(str);
-        debugText_[i]->SetText(data);
-*/
-            /*
-            i++;
-            playerInfo.clear();
-            sprintf(str, "%d", EvolutionManager::getInstance()->agentsAliveCount);
-            playerInfo.append("Evolution Manager: agentsAliveCount -> ").append(str);
-            debugText_[i]->SetText(playerInfo.c_str());
-
-            */
-        }
     }
 
 
@@ -2029,7 +1949,6 @@ void MayaScape::HandleUpdate(StringHash eventType, VariantMap &eventData) {
 
     */
 
-        player_->GetVehicle()->controls_.buttons_ = 0;
 //        gameController->UpdateControlInputs(player_->GetVehicle()->controls_);
 
 
@@ -2074,7 +1993,9 @@ void MayaScape::HandleUpdate(StringHash eventType, VariantMap &eventData) {
     if (input->GetKeyPress(KEY_Z))
         drawDebug_ = !drawDebug_;
 
+
     if (player_) {
+        /*
         // Toggle debug geometry with 'C' key
         player_->changeTargetTime_ += timeStep;
 
@@ -2154,6 +2075,7 @@ void MayaScape::HandleUpdate(StringHash eventType, VariantMap &eventData) {
             // Place on track origin
 //        vehicle_->GetNode()->SetPosition(Vector3(raceTrack_->GetPosition().x_, 500.0f, raceTrack_->GetPosition().z_));
         }
+        */
     }
 
     // Toggle through focus objects
@@ -2186,35 +2108,9 @@ void MayaScape::HandleUpdate(StringHash eventType, VariantMap &eventData) {
 
     int life = 100;
     if (player_) {
-        life = player_->GetLife();
+        life = 0;//player_->GetLife();
 
-        // Get movement controls and assign them to the vehicle component. If UI has a focused element, clear controls
-        if (!ui->GetFocusElement()) {
-            const int CTRL_SPACE = 16;
-            player_->GetVehicle()->controls_.Set(CTRL_FORWARD, input->GetKeyDown(KEY_W) |
-                                                               player_->GetVehicle()->controls_.IsDown(BUTTON_B));
-            player_->GetVehicle()->controls_.Set(CTRL_BACK, input->GetKeyDown(KEY_S) |
-                                                            player_->GetVehicle()->controls_.IsDown(BUTTON_DPAD_DOWN));
-            player_->GetVehicle()->controls_.Set(CTRL_LEFT, input->GetKeyDown(KEY_A) |
-                                                            player_->GetVehicle()->controls_.IsDown(BUTTON_DPAD_LEFT));
-            player_->GetVehicle()->controls_.Set(CTRL_RIGHT, input->GetKeyDown(KEY_D) |
-                                                             player_->GetVehicle()->controls_.IsDown(
-                                                                     BUTTON_DPAD_RIGHT));
-            player_->GetVehicle()->controls_.Set(CTRL_SPACE, input->GetKeyDown(KEY_SPACE) |
-                                                             player_->GetVehicle()->controls_.IsDown(BUTTON_X));
-
-//            player_->GetVehicle()->controls_.Set(CTRL_E, input->GetKeyDown(KEY_E) | player_->GetVehicle()->controls_.IsDown(CONTROLLER_BUTTON_A));
-
-            // Set player to vehicle control
-            player_->SetControls(player_->GetVehicle()->controls_);
-
-        } else
-            player_->GetVehicle()->controls_.Set(CTRL_FORWARD | CTRL_BACK | CTRL_LEFT | CTRL_RIGHT | CTRL_SPACE, false);
-
-        // up right
-        if (input->GetKeyPress(KEY_BACKSPACE)) {
-            Node *vehicleNode = player_->GetVehicle()->GetNode();
-
+/*
             // qualify vehicle orientation
             Vector3 v3Up = vehicleNode->GetWorldUp();
             float fUp = v3Up.DotProduct(Vector3::UP);
@@ -2230,7 +2126,8 @@ void MayaScape::HandleUpdate(StringHash eventType, VariantMap &eventData) {
                 vehicleNode->SetTransform(vPos, qRot);
                 player_->GetVehicle()->ResetForces();
             }
-        }
+
+            */
     }
 
 
@@ -2327,17 +2224,6 @@ void MayaScape::HandlePostUpdate(StringHash eventType, VariantMap &eventData) {
     }
 
 
-
-    if (player_) {
-        player_->floatingText_->SetText(player_->name_);
-        player_->floatingText_->GetNode()->SetPosition(player_->GetNode()->GetPosition() + Vector3(0.0, 20.0, 0.0));
-
-
-        URHO3D_LOGINFOF("player x,y,z [%f,%f,%f]", player_->GetNode()->GetPosition().x_,
-                        player_->GetNode()->GetPosition().y_, player_->GetNode()->GetPosition().z_);
-
-    }
-
 //    targetCameraPos_ = Vector3(0.0f, 60.0f, CAMERA_DISTANCE);
 //    cameraNode_->SetPosition(targetCameraPos_);
 //    cameraNode_->SetRotation(Quaternion(30.0, 0.0, 0.0));
@@ -2371,6 +2257,8 @@ void MayaScape::HandlePostUpdate(StringHash eventType, VariantMap &eventData) {
 
     Node *actorNode = nullptr;
     actorNode = scene_->GetNode(clientObjectID_);
+    // Update player node
+    player_ = static_cast<SharedPtr<Node>>(actorNode);
     using namespace Update;
     float timeStep = eventData[P_TIMESTEP].GetFloat();
 
@@ -2849,7 +2737,7 @@ void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
             }
 
             // Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
-            cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0.0f));
+           // cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0.0f));
 
             // Only move the camera / show instructions if we have a controllable object
             bool showInstructions = false;
@@ -2872,20 +2760,6 @@ void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
                     const float damping = 0.2f;
 
                     Quaternion dir = Quaternion(0, 0, 90);
-                    if (player_) {
-                        if (player_->vehicle_) {
-                            vehicleRot_ = player_->vehicle_->GetNode()->GetRotation();
-                            // Physics update has completed. Position camera behind vehicle
-                            vehicleRot_ = SmoothStepAngle(vehicleRot_, player_->GetNode()->GetRotation(), timeStep * rotLerpRate);
-                            dir = Quaternion(vehicleRot_.YawAngle(), Vector3::UP);
-
-                        }
-                    }
-  //                  dir = dir * Quaternion(20, 0, 45);
-                    //                       dir = dir * Quaternion(player_->GetVehicle()->controls_.yaw_, Vector3::UP);
-//                        dir = dir * Quaternion(player_->GetVehicle()->controls_.pitch_, Vector3::RIGHT);
-
-
 
                     targetCameraPos_ = startPos + Vector3(0, 30.0f, CAMERA_DISTANCE);
                     // Calculate ray based on focus object
