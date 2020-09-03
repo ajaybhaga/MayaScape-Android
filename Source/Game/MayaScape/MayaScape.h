@@ -107,6 +107,7 @@ class MayaScape : public Game
 
     void MoveCamera(Node *actorNode, float timeStep);
     void SetAerialCamera();
+    void SetAerialCamera(const Vector3& target);;
 
 public:
     /// Construct.
@@ -328,7 +329,7 @@ private:
     SharedPtr<Button> exitButton_;
 
     SharedPtr<Text> instructionsText_;
-    SharedPtr<Text> hudText_;
+    Vector<SharedPtr<Text>> hudTextList_;
 
     unsigned clientObjectID_;
     bool isServer_;

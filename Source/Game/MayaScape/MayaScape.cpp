@@ -167,10 +167,12 @@ const int MSG_CHAT = 153;
 const int MSG_NODE_ERROR = 156;
 
 #define INGAME_FONT "Fonts/m6x11.ttf"
+#define INGAME_FONT2 "Fonts/SinsGold.ttf"
 
+#define GAME_SERVER_ADDRESS "159.203.38.221"
 //#define GAME_SERVER_ADDRESS "192.168.122.1"
 //#define GAME_SERVER_ADDRESS "localhost"
-#define GAME_SERVER_ADDRESS "www.monkeymaya.com"
+//#define GAME_SERVER_ADDRESS "www.monkeymaya.com"
 
 int numOfBoidsets = 10; // needs to be an even number for the boid splitting to work properly
 int updateCycleIndex = 0;
@@ -700,7 +702,7 @@ void MayaScape::CreateScene() {
 
         // Set the default UI style and font
         //ui->GetRoot()->SetDefaultStyle(cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
-        auto *font = cache->GetResource<Font>("Fonts/SinsGold.ttf");
+        auto *font = cache->GetResource<Font>(INGAME_FONT2);
 
         // Get powerbar texture
         Texture2D *powerBarTexture = cache->GetResource<Texture2D>("Textures/powerbar.png");
@@ -2413,7 +2415,10 @@ void MayaScape::HandlePostUpdate(StringHash eventType, VariantMap &eventData) {
         MoveCamera(actorNode, timeStep);
 
         instructionsText_->SetVisible(true);
-        hudText_->SetVisible(true);
+
+        for (int i = 0; i < hudTextList_.Size(); i++) {
+            hudTextList_[i]->SetVisible(true);
+        }
 
     } else {
         // Server
@@ -2682,7 +2687,7 @@ void MayaScape::CreateUI() {
             ""
             "An online open world combat racing game."
     );
-    instructionsText_->SetFont(cache->GetResource<Font>("Fonts/SinsGold.ttf"), 24);
+    instructionsText_->SetFont(cache->GetResource<Font>(INGAME_FONT2), 24);
     instructionsText_->SetColor(Color::WHITE);
     // Position the text relative to the screen center
     instructionsText_->SetHorizontalAlignment(HA_CENTER);
@@ -2691,18 +2696,21 @@ void MayaScape::CreateUI() {
     instructionsText_->SetVisible(false);
 
 
-    // Construct the instructions text element
-    hudText_ = ui->GetRoot()->CreateChild<Text>();
-    hudText_->SetText("");
-    hudText_->SetFont(cache->GetResource<Font>(INGAME_FONT), 24);
-    hudText_->SetColor(Color::WHITE);
-    // Position the text relative to the screen center
-    hudText_->SetHorizontalAlignment(HA_CENTER);
-    hudText_->SetPosition(0, 610);
-    // Hide until connected
-    hudText_->SetVisible(false);
+    int hudTextCount = 4;
+    for (int i = 0; i < hudTextCount; i++) {
+        // Construct the text element
+        SharedPtr<Text> hudText_ = static_cast<SharedPtr<Text>>(ui->GetRoot()->CreateChild<Text>());
+        hudText_->SetText("");
+        hudText_->SetFont(cache->GetResource<Font>(INGAME_FONT2), 17);
+        hudText_->SetColor(Color::WHITE);
+        // Position the text relative to the screen center
+        hudText_->SetHorizontalAlignment(HA_CENTER);
+        hudText_->SetPosition(0, 610+(i*20.0f));
+        // Hide until connected
+        hudText_->SetVisible(false);
 
-
+        hudTextList_.Push(hudText_);
+    }
 
     buttonContainer_ = root->CreateChild<UIElement>();
     buttonContainer_->SetFixedSize(1800, 600);
@@ -2752,7 +2760,7 @@ void MayaScape::CreateUI() {
     // Set a low priority for the logo so that other UI elements can be drawn on top
     logoSprite_->SetPriority(-100);
 
-    auto *font = cache->GetResource<Font>("Fonts/SinsGold.ttf");
+    auto *font = cache->GetResource<Font>(INGAME_FONT2);
     chatHistoryText_ = root->CreateChild<Text>();
     chatHistoryText_->SetFont(font, 12);
     chatHistoryText_->SetVisible(false);
@@ -2845,6 +2853,12 @@ void MayaScape::SetAerialCamera() {
     cameraNode_->SetRotation(Quaternion(90.0f, 0.0f, 0.0f));
 }
 
+void MayaScape::SetAerialCamera(const Vector3& target) {
+    // Apply camera transformations
+    cameraNode_->SetPosition(Vector3(target.x_, terrain_->GetHeight(target)+80.0f, target.z_));
+    cameraNode_->SetRotation(Quaternion(90.0f, 0.0f, 0.0f));
+}
+
 void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
     // Right mouse button controls mouse cursor visibility: hide when pressed
     UI *ui = GetSubsystem<UI>();
@@ -2877,9 +2891,6 @@ void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
             if (clientObjectID_) {
 
                 //URHO3D_LOGINFOF("--- Found controllable object: %u", clientObjectID_);
-
-
-                // TODO: Client don't have a network actor -> this will crash
 
                 if (actorNode) {
 
@@ -3016,8 +3027,8 @@ void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
 
                     showInstructions = true;
 
-                    URHO3D_LOGINFO("--- Retrieved NetworkActor.");
-                    SetAerialCamera();
+//                    URHO3D_LOGINFO("--- Retrieved NetworkActor.");
+                    SetAerialCamera(actorNode->GetPosition());
 
 
                 } else {
@@ -3096,6 +3107,8 @@ void MayaScape::HandlePhysicsPreStep(StringHash eventType, VariantMap &eventData
 //        sprintf(str, "[%f, %f, %s]", controls.pitch_, controls.yaw_,
 //                ToStringHex(controls.buttons_).CString());
 
+
+/*
         if (player_) {
             if (player_->vehicle_) {
                 sprintf(str, "[%f, %f]", player_->vehicle_->lastAccel_, player_->vehicle_->lastSteer_);
@@ -3105,9 +3118,41 @@ void MayaScape::HandlePhysicsPreStep(StringHash eventType, VariantMap &eventData
 
             }
         }
+*/
 
-        String hudText = "network control: " + String(ntwkControls_.buttons_);
-        hudText_->SetText(hudText);
+        Node *actorNode = nullptr;
+        String hudText = "";
+
+        if (clientObjectID_) {
+            actorNode = scene_->GetNode(clientObjectID_);
+
+            if (actorNode) {
+                // Controllable client network actor (replicated from server based on client controls)
+
+                for (int i = 0; i < hudTextList_.Size(); i++) {
+                    switch (i) {
+                        case 0:
+                            hudText = "network control: " + String(ntwkControls_.buttons_);
+                            break;
+                        case 1:
+                            hudText = "h2: actor pos(x,y,z) = " + String(actorNode->GetPosition());
+                            break;
+                        case 2:
+                            hudText = "h3: actor pos(x,y,z) = " + String(actorNode->GetPosition());
+                            break;
+                        case 3:
+                            hudText = "h4: actor pos(x,y,z) = " + String(actorNode->GetPosition());
+                            break;
+                    }
+
+                    hudTextList_[i]->SetText(hudText);
+                }
+
+            }
+
+
+        }
+
 
         server->UpdatePhysicsPreStep(ntwkControls_);
 
@@ -3254,7 +3299,6 @@ void MayaScape::HandleConnect(StringHash eventType, VariantMap &eventData) {
 
         String playerText = "Logged in as: " + String(clientName_.CString());
         instructionsText_->SetText(playerText);
-        hudText_->SetText("HUD 1");
         instructionsText_->SetPosition(0, 730);
 
 
