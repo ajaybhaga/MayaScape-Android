@@ -1441,9 +1441,17 @@ void MayaScape::HandleNodeCollision(StringHash eventType, VariantMap& eventData)
 
 void MayaScape::HandlePlayerStateUpdate(StringHash eventType, VariantMap& eventData) {
 
-    URHO3D_LOGINFO("Client -> HandlePlayerStateUpdate");
+    using namespace ClientPlayerState;
+    int id = eventData[P_ID].GetUInt();
+    int life = eventData[P_LIFE].GetUInt();
+    float rpm = eventData[P_RPM].GetFloat();
+    float velocity = eventData[P_VELOCITY].GetFloat();
+    float steer = eventData[P_STEER].GetFloat();
 
+    // Store updated node id
+    clientObjectID_ = id;
 
+    //URHO3D_LOGINFOF("Client -> HandlePlayerStateUpdate: %d, %d, %f, %f, %f", id, life, rpm, velocity, steer);
 }
 
 
@@ -2755,7 +2763,7 @@ void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
                     const float CAMERA_DISTANCE = 8.0f;
 
                     Vector3 startPos = actorNode->GetPosition();
-                    //URHO3D_LOGINFOF("--- Found controllable object -> position: [%f, %f, %f] ", actorNode->GetPosition().x_, actorNode->GetPosition().y_, actorNode->GetPosition().z_);
+                    URHO3D_LOGINFOF("--- Found controllable object -> position: [%f, %f, %f] ", actorNode->GetPosition().x_, actorNode->GetPosition().y_, actorNode->GetPosition().z_);
 
                     // Snap camera to vehicle once available
 
