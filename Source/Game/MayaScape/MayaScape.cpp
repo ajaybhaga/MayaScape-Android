@@ -1990,10 +1990,6 @@ void MayaScape::HandleUpdate(StringHash eventType, VariantMap &eventData) {
     if (input->GetKeyPress(KEY_Z))
         drawDebug_ = !drawDebug_;
 
-    // Check for loading / saving the scene
-    if (input->GetKeyPress(KEY_F5))
-        SaveScene(false);
-
     if (player_) {
         /*
         // Toggle debug geometry with 'C' key
@@ -2130,8 +2126,10 @@ void MayaScape::HandleUpdate(StringHash eventType, VariantMap &eventData) {
 
     // Toggle physics debug geometry with space
     if (input->GetKeyPress(KEY_F5)) {
-        drawDebug_ = !drawDebug_;
+//        drawDebug_ = !drawDebug_;
+        SaveScene(false);
     }
+
 
     // Check for loading / saving the scene
     if (input->GetKeyPress(KEY_K)) {
@@ -3153,11 +3151,15 @@ void MayaScape::HandleConnect(StringHash eventType, VariantMap &eventData) {
     identity["UserName"] = name;
     identity["ColorIdx"] = idx;
 
+    scene_->Clear(true, false);
+
     // Client connect to server
     if (server->Connect(address, SERVER_PORT, identity)) {
 
         URHO3D_LOGINFOF("client identity name=%s", name.CString());
         URHO3D_LOGINFOF("HandleClientConnected - data: [%s, %d]", name.CString(), idx);
+
+  //      CreateScene();
 
         // Store in local login list
         loginList_.Push(name.CString());
@@ -3218,6 +3220,7 @@ void MayaScape::HandleConnect(StringHash eventType, VariantMap &eventData) {
         URHO3D_LOGINFOF("client idx=%i, username=%s", idx, name.CString());
 
 //         server-
+        scene_->Clear(true, false);
 
     } else {
         URHO3D_LOGINFOF("Connection to server failed =%s", address.CString());

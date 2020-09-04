@@ -426,6 +426,7 @@ void Server::DestroyPlayer(Connection* connection) {
     if (object)
     {
         URHO3D_LOGINFOF("**** DESTROYING CLIENT OBJECT -> %d", object->GetID());
+        object->RemoveAllChildren();
         object->Remove();
     }
 
