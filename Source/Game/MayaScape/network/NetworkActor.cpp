@@ -208,9 +208,11 @@ void NetworkActor::FixedUpdate(float timeStep) {
 //        URHO3D_LOGINFOF("NetworkActor: FixedUpdate - applying controls for client [%d] -> %s", GetID(),
 //                        ToStringHex(controls_.buttons_).CString());
 
-        // Snap network actor position to vehicle
-        if (vehicle_)
+        // Snap network actor position/rotation to vehicle
+        if (vehicle_) {
             GetNode()->SetPosition(vehicle_->GetNode()->GetPosition());
+            GetNode()->SetRotation(vehicle_->GetNode()->GetRotation());
+        }
 
         // TODO: 3d text not showing up
         nodeInfo_->SetPosition(GetNode()->GetPosition() + Vector3(0.0f, 1.1f, 0.0f));

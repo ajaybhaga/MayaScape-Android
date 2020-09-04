@@ -107,9 +107,9 @@ class MayaScape : public Game
 
     void MoveCamera(Node *actorNode, float timeStep);
     void SetAerialCamera();
-    void SetAerialCamera(const Vector3& target);;
+    void SetAerialCamera(const Vector3& target, float yaw);
 
-public:
+        public:
     /// Construct.
     explicit MayaScape(Context* context);
 

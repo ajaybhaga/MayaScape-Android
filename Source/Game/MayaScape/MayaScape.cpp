@@ -1451,7 +1451,7 @@ void MayaScape::HandlePlayerStateUpdate(StringHash eventType, VariantMap& eventD
     // Store updated node id
     playerObjectID_ = id;
 
-    URHO3D_LOGINFOF("Client -> HandlePlayerStateUpdate: %d, %d, %f, %f, %f", id, life, rpm, velocity, steer);
+//    URHO3D_LOGINFOF("Client -> HandlePlayerStateUpdate: %d, %d, %f, %f, %f", id, life, rpm, velocity, steer);
 }
 
 
@@ -2711,7 +2711,7 @@ void MayaScape::SetAerialCamera() {
     cameraNode_->SetRotation(Quaternion(90.0f, 0.0f, 0.0f));
 }
 
-void MayaScape::SetAerialCamera(const Vector3& target) {
+void MayaScape::SetAerialCamera(const Vector3& target, float yaw) {
 
     Vector3 tgt;
     tgt = target;
@@ -2719,8 +2719,13 @@ void MayaScape::SetAerialCamera(const Vector3& target) {
         tgt = Vector3(0.0f, 90.0f, 0.0f);
     }
     // Apply camera transformations
-    cameraNode_->SetPosition(Vector3(tgt.x_, tgt.y_+2.0f, tgt.z_));
-    cameraNode_->SetRotation(Quaternion(90.0f, 0.0f, 0.0f));
+    cameraNode_->SetPosition(Vector3(tgt.x_, tgt.y_+20.0f, tgt.z_));
+    float delta = (yaw+180.0f)-cameraNode_->GetRotation().YawAngle();
+    URHO3D_LOGINFOF("--- yaw delta of cam vs. vehicle: %f", delta);
+    cameraNode_->SetRotation(Quaternion(75.0f, cameraNode_->GetRotation().YawAngle()+(delta*0.98f), 0.0f));
+
+
+    URHO3D_LOGINFOF("--- yaw: %f", yaw);
 }
 
 void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
@@ -2763,7 +2768,7 @@ void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
                     const float CAMERA_DISTANCE = 8.0f;
 
                     Vector3 startPos = actorNode->GetPosition();
-                    URHO3D_LOGINFOF("--- Found controllable object -> position: %d [%f, %f, %f] ", playerObjectID_, actorNode->GetPosition().x_, actorNode->GetPosition().y_, actorNode->GetPosition().z_);
+//                    URHO3D_LOGINFOF("--- Found controllable object -> position: %d [%f, %f, %f] ", playerObjectID_, actorNode->GetPosition().x_, actorNode->GetPosition().y_, actorNode->GetPosition().z_);
 
                     // Snap camera to vehicle once available
 
@@ -2880,7 +2885,7 @@ void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
                     showInstructions = true;
 
 //                    URHO3D_LOGINFO("--- Retrieved NetworkActor.");
-                    SetAerialCamera(actorNode->GetPosition());
+                    SetAerialCamera(actorNode->GetPosition(), actorNode->GetRotation().YawAngle());
 
 
                 } else {
