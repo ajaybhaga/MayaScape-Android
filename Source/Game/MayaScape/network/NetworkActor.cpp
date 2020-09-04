@@ -76,11 +76,13 @@ NetworkActor::~NetworkActor() {
 
     if (vehicle_) {
         URHO3D_LOGINFOF("**** DESTROYING CLIENT VEHICLE OBJECT -> %d", this->id_);
+        vehicle_->GetNode()->RemoveAllChildren();
         vehicle_->Remove();
     }
 
     if (nodeInfo_) {
         URHO3D_LOGINFOF("**** DESTROYING CLIENT NODE OBJECT -> %d", this->id_);
+        nodeInfo_->RemoveAllChildren();
         nodeInfo_->Remove();
     }
 
@@ -128,7 +130,7 @@ void NetworkActor::Create() {
         // physics components
 //    pRigidBody_->SetUseGravity(false);
 
-        pRigidBody_ = vehicleNode->GetOrCreateComponent<RigidBody>();
+        pRigidBody_ = vehicleNode->GetOrCreateComponent<RigidBody>(LOCAL);
         /* pRigidBody_->SetCollisionLayer(NETWORKACTOR_COL_LAYER);
          pRigidBody_->SetMass(mass_);
          pRigidBody_->SetFriction(1.0f);
@@ -140,7 +142,7 @@ void NetworkActor::Create() {
 
 
         // create text3d client info node LOCALLY
-        nodeInfo_ = GetScene()->CreateChild("light", REPLICATED);
+        nodeInfo_ = GetScene()->CreateChild("light", LOCAL);
         floatingText_ = nodeInfo_->CreateComponent<Text3D>();
         floatingText_->SetColor(Color::GREEN);
         floatingText_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 20);
