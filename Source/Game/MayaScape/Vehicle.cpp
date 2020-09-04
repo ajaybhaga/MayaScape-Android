@@ -216,7 +216,7 @@ void Vehicle::Init(bool isServer, Vector3 initialPos)
 
 //    Node *vehicleNode = GetScene()->CreateChild("Vehicle", LOCAL);
 
-    raycastVehicle_ = node_->CreateComponent<RaycastVehicle>(REPLICATED);
+    raycastVehicle_ = node_->CreateComponent<RaycastVehicle>(LOCAL);
     raycastVehicle_->SetEnabled(true);
     raycastVehicle_->GetNode()->SetPosition(initialPos);
 
