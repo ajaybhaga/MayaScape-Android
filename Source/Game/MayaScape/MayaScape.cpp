@@ -1990,6 +1990,9 @@ void MayaScape::HandleUpdate(StringHash eventType, VariantMap &eventData) {
     if (input->GetKeyPress(KEY_Z))
         drawDebug_ = !drawDebug_;
 
+    // Check for loading / saving the scene
+    if (input->GetKeyPress(KEY_F5))
+        SaveScene(false);
 
     if (player_) {
         /*
@@ -2092,9 +2095,6 @@ void MayaScape::HandleUpdate(StringHash eventType, VariantMap &eventData) {
         focusIndex_ = focusIndex_ % focusObjects_.Size();
     }
 
-    // Check for loading / saving the scene
-    if (input->GetKeyPress(KEY_F5))
-        SaveScene(false);
 
 
     if (input->GetKeyPress(KEY_F7))
@@ -2720,7 +2720,7 @@ void MayaScape::SetAerialCamera(const Vector3& target, float yaw) {
     }
     // Apply camera transformations
     cameraNode_->SetPosition(Vector3(tgt.x_, tgt.y_+20.0f, tgt.z_));
-    float delta = (yaw+180.0f)-cameraNode_->GetRotation().YawAngle();
+    float delta = (yaw-180.0f)-cameraNode_->GetRotation().YawAngle();
     URHO3D_LOGINFOF("--- yaw delta of cam vs. vehicle: %f", delta);
     cameraNode_->SetRotation(Quaternion(75.0f, cameraNode_->GetRotation().YawAngle()+(delta*0.98f), 0.0f));
 
