@@ -186,39 +186,14 @@ void Vehicle::ApplyAttributes()
 {
 }
 
-//=============================================================================
-// This function is called only from the main program when initially creating 
-// the vehicle, not on scene load
-//=============================================================================
-void Vehicle::Init(bool isServer, Vector3 initialPos)
-{
+
+void Vehicle::Create() {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-
-
-    // node collision
-    SubscribeToEvent(GetNode(), E_NODECOLLISION, URHO3D_HANDLER(Vehicle, HandleVehicleCollision));
-
-//E_NODECOLLISIONSTART
-    //Node* adjNode = node_->CreateChild("AdjNode", REPLICATED);
-    //adjNode->SetRotation(Quaternion(0.0, 0.0, -90.0f));
-
-    node_->SetPosition(initialPos);
-
-/*
-    // On client
-    if (!isServer) {
-        // Don't create raycast vehicle, let server handle it
-        raycastVehicle_ = nullptr
-    } else {
-        raycastVehicle_ = node_->CreateComponent<RaycastVehicle>();
-    }
-*/
 
 //    Node *vehicleNode = GetScene()->CreateChild("Vehicle", LOCAL);
 
     raycastVehicle_ = node_->CreateComponent<RaycastVehicle>(LOCAL);
     raycastVehicle_->SetEnabled(true);
-    raycastVehicle_->GetNode()->SetPosition(initialPos);
 
     hullColShape_ = node_->CreateComponent<CollisionShape>(REPLICATED);
     hullObject_ = node_->CreateComponent<StaticModel>(REPLICATED);
@@ -425,6 +400,31 @@ void Vehicle::Init(bool isServer, Vector3 initialPos)
 
     // acceleration sound while in air - most probably want this on
     playAccelerationSoundInAir_ = true;
+}
+
+//=============================================================================
+// This function is called only from the main program when initially creating 
+// the vehicle, not on scene load
+//=============================================================================
+void Vehicle::Init(bool isServer, Vector3 initialPos) {
+
+    // node collision
+    SubscribeToEvent(GetNode(), E_NODECOLLISION, URHO3D_HANDLER(Vehicle, HandleVehicleCollision));
+
+//E_NODECOLLISIONSTART
+    //Node* adjNode = node_->CreateChild("AdjNode", REPLICATED);
+    //adjNode->SetRotation(Quaternion(0.0, 0.0, -90.0f));
+
+    node_->SetPosition(initialPos);
+/*
+    // On client
+    if (!isServer) {
+        // Don't create raycast vehicle, let server handle it
+        raycastVehicle_ = nullptr
+    } else {
+        raycastVehicle_ = node_->CreateComponent<RaycastVehicle>();
+    }
+*/
 }
 
 //=============================================================================

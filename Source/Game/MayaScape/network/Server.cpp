@@ -110,43 +110,21 @@ void Server::Disconnect()
     }
 }
 
-Node* Server::CreateClientObject(Connection *connection)
-{
-    Node* clientNode = scene_->CreateChild("LoginClient");
-//    clientNode->SetPosition(Vector3(Random(40.0f) - 20.0f, 300.0f, Random(40.0f) - 20.0f));
-    clientNode->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
-
-    ClientObj *clientObj = (ClientObj*)clientNode->CreateComponent(clientHash_);
-
-    // set identity
-    if (connection)
-    {
-        String name = connection->identity_["UserName"].GetString();
-        int colorIdx = connection->identity_["ColorIdx"].GetInt();
-        clientObj->SetClientInfo(name, colorIdx);
-
-        URHO3D_LOGINFOF("client identity name=%s", name.CString());
-        URHO3D_LOGINFOF("HandleClientConnected - data: [%s, %d]", name.CString(), colorIdx);
-        // Store login name with connection
-        loginList_.Populate(name.CString(), connection);
-    }
-
-    return clientNode;
-}
-
-
 Node* Server::CreatePlayer(Connection* connection) {
+
     Node *playerNode = scene_->CreateChild("Player", REPLICATED);
+
+//    ClientObj *clientObj = (ClientObj*)playerNode->CreateComponent(clientHash_);
+    // Player is replaced with NetworkActor -> which is a Player
+    NetworkActor* actorClientObj_ = (NetworkActor*)playerNode->CreateComponent(clientHash_);
+    actorClientObj_->isServer_ = true;
 
     // Place on track
 //    playerNode->SetPosition(Vector3(-814.0f + Random(-400.f, 400.0f), 400.0f, -595.0f + Random(-400.f, 400.0f)));
 
-    // Player is replaced with NetworkActor -> which is a Player
-    NetworkActor* player_ = playerNode->CreateComponent<NetworkActor>();
-    player_->isServer_ = true;
 
     // Store the player in map
-    actorMap_.Populate(connection, player_);
+    actorMap_.Populate(connection, actorClientObj_);
 
 //    player_->GetNode()->SetPosition(Vector3(0, 0, 0));
 
@@ -157,6 +135,19 @@ Node* Server::CreatePlayer(Connection* connection) {
 //    player_->SetWaypoints(&waypointsWorld_);
 
     playerNode->SetRotation(Quaternion(0.0, -0.0, -0.0));
+
+    // set identity
+    if (connection)
+    {
+        String name = connection->identity_["UserName"].GetString();
+        int colorIdx = connection->identity_["ColorIdx"].GetInt();
+        actorClientObj_->SetClientInfo(name, colorIdx);
+
+        URHO3D_LOGINFOF("client identity name=%s", name.CString());
+        URHO3D_LOGINFOF("HandleClientConnected - data: [%s, %d]", name.CString(), colorIdx);
+        // Store login name with connection
+        loginList_.Populate(name.CString(), connection);
+    }
 
 
     /*
@@ -323,9 +314,10 @@ void Server::HandleClientIdentity(StringHash eventType, VariantMap& eventData)
 
 
     // Then create a controllable object for that client
-    Node* clientObject = CreateClientObject(newConnection);
-    // Create player for new client
-    CreatePlayer(newConnection);
+    //Node* clientObject = CreateClientObject(newConnection);
+
+    // Create player for new client (NetworkActor is child of ClientObj)
+    Node* clientObject = CreatePlayer(newConnection);
     serverObjects_[newConnection] = clientObject;
 
     URHO3D_LOGINFOF("Server: Client players -> %d", serverObjects_.Size());

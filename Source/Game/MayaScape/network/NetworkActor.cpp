@@ -76,13 +76,13 @@ NetworkActor::~NetworkActor() {
 
     if (vehicle_) {
         URHO3D_LOGINFOF("**** DESTROYING CLIENT VEHICLE OBJECT -> %d", this->id_);
-        vehicle_->GetNode()->RemoveAllChildren();
+//        vehicle_->GetNode()->RemoveAllChildren();
         vehicle_->Remove();
     }
 
     if (nodeInfo_) {
         URHO3D_LOGINFOF("**** DESTROYING CLIENT NODE OBJECT -> %d", this->id_);
-        nodeInfo_->RemoveAllChildren();
+//        nodeInfo_->RemoveAllChildren();
         nodeInfo_->Remove();
     }
 
@@ -108,25 +108,25 @@ void NetworkActor::DelayedStart() {
 // This will be run by server to create server objects (running the physics world)
 void NetworkActor::Create() {
 
-    if (userName_.Empty())
-        return;
-
     if (!created_) {
-        if (!userName_.Empty()) {
             ResourceCache *cache = GetSubsystem<ResourceCache>();
 
             // Init vehicle
+//            Node *vehicleNode = GetScene()->CreateChild("Vehicle", REPLICATED);
             Node *vehicleNode = GetScene()->CreateChild("Vehicle", REPLICATED);
 
             // Default at (0,300,0) above terrain before we set location
+            float factor = 500.0f;
 
             // Place on track
-//    vehicleNode->SetPosition(Vector3(-814.0f+Random(-400.f, 400.0f), 500.0f, -595.0f+Random(-400.f, 400.0f)));
+//           vehicleNode->SetPosition(Vector3(-814.0f+Random(-400.f, 400.0f), 500.0f, -595.0f+Random(-400.f, 400.0f)));
+            vehicleNode->SetPosition(Vector3(0,0,0));
 
             // Create the vehicle logic component
             vehicle_ = vehicleNode->CreateComponent<Vehicle>();
-            float factor = 500.0f;
-            vehicle_->Init(isServer_, Vector3(Random(-factor, factor), 300, Random(-factor, factor)));
+            vehicle_->Init(isServer_, Vector3(-814.0f+Random(-400.f, 400.0f), 500.0f, -595.0f+Random(-400.f, 400.0f)));
+            vehicle_->Create();
+//        GetNode()->SetPosition(vehicle_->GetNode()->GetPosition());
 
             wpActiveIndex_ = 0;
             targetAgentIndex_ = 0;
@@ -146,7 +146,7 @@ void NetworkActor::Create() {
 
 
             // create text3d client info node LOCALLY
-            nodeInfo_ = GetScene()->CreateChild("light", LOCAL);
+            nodeInfo_ = GetNode()->CreateChild("light", LOCAL);
             floatingText_ = nodeInfo_->CreateComponent<Text3D>();
             floatingText_->SetColor(Color::GREEN);
             floatingText_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 20);
@@ -165,7 +165,7 @@ void NetworkActor::Create() {
 */
             // register
             SetUpdateEventMask(USE_FIXEDUPDATE);
-        }
+
     }
 
     // Instance created
@@ -191,10 +191,11 @@ void NetworkActor::SwapMat() {
 void NetworkActor::SetControls(Controls controls) {
     controls_ = controls;
 
-    // Apply control to vehicle
-    vehicle_->controls_ = controls;
+    if (vehicle_) {
+        // Apply control to vehicle
+        vehicle_->controls_ = controls;
 //    URHO3D_LOGDEBUG("NetworkActor::SetControls -> applying to physics world.");
-
+    }
 }
 
 void NetworkActor::FixedUpdate(float timeStep) {
