@@ -108,6 +108,9 @@ void NetworkActor::DelayedStart() {
 // This will be run by server to create server objects (running the physics world)
 void NetworkActor::Create() {
 
+    if (userName_.Empty())
+        return;
+
     if (!created_) {
         if (!userName_.Empty()) {
             ResourceCache *cache = GetSubsystem<ResourceCache>();
