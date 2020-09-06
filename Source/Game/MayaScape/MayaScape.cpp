@@ -642,7 +642,6 @@ void MayaScape::CreateScene() {
     // On client
     if (!isServer_) {
 
-
         // Enable for 3D sounds to work (attach to camera node)
         SoundListener *listener = cameraNode_->CreateComponent<SoundListener>();
         GetSubsystem<Audio>()->SetListener(listener);
@@ -1355,6 +1354,14 @@ void MayaScape::HandleSceneRendered(StringHash eventType, VariantMap &eventData)
     //   scene_->SetUpdateEnabled(false);
 }
 
+void MayaScape::HandleClientSceneLoaded(StringHash eventType, VariantMap& eventData)
+{
+    using namespace ClientSceneLoaded;
+    URHO3D_LOGINFO("HandleClientSceneLoaded");
+    URHO3D_LOGINFOF("Client: Scene checksum -> %s", ToStringHex(scene_->GetChecksum()).CString());
+
+}
+
 void MayaScape::SubscribeToEvents() {
 
     // Subscribe to UI element events
@@ -1366,6 +1373,7 @@ void MayaScape::SubscribeToEvents() {
 
     // Subscribe to network events
     SubscribeToEvent(E_NETWORKMESSAGE, URHO3D_HANDLER(MayaScape, HandleNetworkMessage));
+    SubscribeToEvent(E_CLIENTSCENELOADED, URHO3D_HANDLER(MayaScape, HandleClientSceneLoaded));
 
     SubscribeToEvent(E_PHYSICSPRESTEP, URHO3D_HANDLER(MayaScape, HandlePhysicsPreStep));
     SubscribeToEvent(E_POSTUPDATE, URHO3D_HANDLER(MayaScape, HandlePostUpdate));
@@ -2718,12 +2726,12 @@ void MayaScape::SetAerialCamera(const Vector3& target, float yaw) {
     }
     // Apply camera transformations
     cameraNode_->SetPosition(Vector3(tgt.x_, tgt.y_+20.0f, tgt.z_));
-    float delta = (yaw-180.0f)-cameraNode_->GetRotation().YawAngle();
-    URHO3D_LOGINFOF("--- yaw delta of cam vs. vehicle: %f", delta);
+    float delta = (yaw-360.0f)-cameraNode_->GetRotation().YawAngle();
+//    URHO3D_LOGINFOF("--- yaw delta of cam vs. vehicle: %f", delta);
     cameraNode_->SetRotation(Quaternion(75.0f, cameraNode_->GetRotation().YawAngle()+(delta*0.98f), 0.0f));
 
 
-    URHO3D_LOGINFOF("--- yaw: %f", yaw);
+//    URHO3D_LOGINFOF("--- yaw: %f", yaw);
 }
 
 void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
@@ -3470,12 +3478,6 @@ void MayaScape::HandleNetworkMessage(StringHash /*eventType*/, VariantMap &event
         ShowChatText(text);
     }
 }
-
-void MayaScape::HandleClientSceneLoaded(StringHash eventType, VariantMap &eventData) {
-    using namespace ClientSceneLoaded;
-    URHO3D_LOGINFO("MayaScape::HandleClientSceneLoaded");
-}
-
 
 String MayaScape::SaveScene(bool initial) {
     String filename = "MayaScape_demo";

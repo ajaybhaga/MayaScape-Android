@@ -159,11 +159,12 @@ Node* Server::CreatePlayer(Connection* connection) {
     playerNode->SetRotation(Quaternion(0.0, -0.0, -0.0));
 
 
+    /*
     // Register player on CSP server
     auto csp = scene_->GetComponent<CSP_Server>();
     // Assign player node to csp snapshot
     csp->add_node(playerNode);
-
+*/
     /*
     // Register player on CSP server
     auto csp = scene_->GetComponent<CSP_Server>();

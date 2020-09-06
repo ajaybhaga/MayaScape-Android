@@ -112,7 +112,7 @@ void NetworkActor::Create() {
         ResourceCache *cache = GetSubsystem<ResourceCache>();
 
         // Init vehicle
-        Node *vehicleNode = GetScene()->CreateChild("Vehicle", REPLICATED);
+        Node *vehicleNode = GetNode()->CreateChild("Vehicle", REPLICATED);
 
         // Default at (0,300,0) above terrain before we set location
 
@@ -142,7 +142,7 @@ void NetworkActor::Create() {
 
 
         // create text3d client info node LOCALLY
-        nodeInfo_ = GetScene()->CreateChild("light", LOCAL);
+        nodeInfo_ = GetNode()->CreateChild("light", LOCAL);
         floatingText_ = nodeInfo_->CreateComponent<Text3D>();
         floatingText_->SetColor(Color::GREEN);
         floatingText_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 20);
