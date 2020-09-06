@@ -154,6 +154,7 @@ public:
     SharedPtr<Text3D> floatingText_;
 
     bool isServer_;
+    bool created_;
 
     /// Flag when player is dead.
     bool killed_;

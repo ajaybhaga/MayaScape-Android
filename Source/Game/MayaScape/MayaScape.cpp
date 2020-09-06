@@ -2713,7 +2713,7 @@ void MayaScape::UpdateButtons() {
 
 void MayaScape::SetAerialCamera() {
     // Apply camera transformations
-    cameraNode_->SetPosition(Vector3(0.0f, 160.0f, 0.0f));
+    cameraNode_->SetPosition(Vector3(0.0f, 180.0f, 0.0f));
     cameraNode_->SetRotation(Quaternion(90.0f, 0.0f, 0.0f));
 }
 

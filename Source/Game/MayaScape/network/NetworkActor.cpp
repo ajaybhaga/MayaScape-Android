@@ -66,7 +66,7 @@ NetworkActor::NetworkActor(Context *context)
     lastFire_ = 0;
     targetAgentIndex_ = 0;
 //    bulletType_ = "AP";
-
+    created_ = false;
 
 }
 
@@ -108,46 +108,47 @@ void NetworkActor::DelayedStart() {
 // This will be run by server to create server objects (running the physics world)
 void NetworkActor::Create() {
 
-    if (!userName_.Empty()) {
-        ResourceCache *cache = GetSubsystem<ResourceCache>();
+    if (!created_) {
+        if (!userName_.Empty()) {
+            ResourceCache *cache = GetSubsystem<ResourceCache>();
 
-        // Init vehicle
-        Node *vehicleNode = GetScene()->CreateChild("Vehicle", REPLICATED);
+            // Init vehicle
+            Node *vehicleNode = GetScene()->CreateChild("Vehicle", REPLICATED);
 
-        // Default at (0,300,0) above terrain before we set location
+            // Default at (0,300,0) above terrain before we set location
 
-        // Place on track
+            // Place on track
 //    vehicleNode->SetPosition(Vector3(-814.0f+Random(-400.f, 400.0f), 500.0f, -595.0f+Random(-400.f, 400.0f)));
 
-        // Create the vehicle logic component
-        vehicle_ = vehicleNode->CreateComponent<Vehicle>();
-        float factor = 500.0f;
-        vehicle_->Init(isServer_, Vector3(Random(-factor, factor), 300, Random(-factor, factor)));
+            // Create the vehicle logic component
+            vehicle_ = vehicleNode->CreateComponent<Vehicle>();
+            float factor = 500.0f;
+            vehicle_->Init(isServer_, Vector3(Random(-factor, factor), 300, Random(-factor, factor)));
 
-        wpActiveIndex_ = 0;
-        targetAgentIndex_ = 0;
+            wpActiveIndex_ = 0;
+            targetAgentIndex_ = 0;
 
-        // physics components
+            // physics components
 //    pRigidBody_->SetUseGravity(false);
 
-        pRigidBody_ = vehicleNode->GetOrCreateComponent<RigidBody>(LOCAL);
-        /* pRigidBody_->SetCollisionLayer(NETWORKACTOR_COL_LAYER);
-         pRigidBody_->SetMass(mass_);
-         pRigidBody_->SetFriction(1.0f);
-         pRigidBody_->SetLinearDamping(0.5f);
-         pRigidBody_->SetAngularDamping(0.5f);
-         CollisionShape* shape = vehicleNode->GetOrCreateComponent<CollisionShape>(LOCAL);
-         shape->SetSphere(1.0f);*/
-        vehicleNode->SetRotation(Quaternion(0.0, -90.0, 0.0));
+            pRigidBody_ = vehicleNode->GetOrCreateComponent<RigidBody>(LOCAL);
+            /* pRigidBody_->SetCollisionLayer(NETWORKACTOR_COL_LAYER);
+             pRigidBody_->SetMass(mass_);
+             pRigidBody_->SetFriction(1.0f);
+             pRigidBody_->SetLinearDamping(0.5f);
+             pRigidBody_->SetAngularDamping(0.5f);
+             CollisionShape* shape = vehicleNode->GetOrCreateComponent<CollisionShape>(LOCAL);
+             shape->SetSphere(1.0f);*/
+            vehicleNode->SetRotation(Quaternion(0.0, -90.0, 0.0));
 
 
-        // create text3d client info node LOCALLY
-        nodeInfo_ = GetScene()->CreateChild("light", LOCAL);
-        floatingText_ = nodeInfo_->CreateComponent<Text3D>();
-        floatingText_->SetColor(Color::GREEN);
-        floatingText_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 20);
-        floatingText_->SetFaceCameraMode(FC_ROTATE_XYZ);
-        // create text3d client info node LOCALLY
+            // create text3d client info node LOCALLY
+            nodeInfo_ = GetScene()->CreateChild("light", LOCAL);
+            floatingText_ = nodeInfo_->CreateComponent<Text3D>();
+            floatingText_->SetColor(Color::GREEN);
+            floatingText_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 20);
+            floatingText_->SetFaceCameraMode(FC_ROTATE_XYZ);
+            // create text3d client info node LOCALLY
 //    nodeInfo_ = GetScene()->CreateChild("light", LOCAL);
 
 
@@ -159,9 +160,13 @@ void NetworkActor::Create() {
     text3D->SetText(userName_);
     text3D->SetFaceCameraMode(FC_ROTATE_XYZ);
 */
-        // register
-        SetUpdateEventMask(USE_FIXEDUPDATE);
+            // register
+            SetUpdateEventMask(USE_FIXEDUPDATE);
+        }
     }
+
+    // Instance created
+    created_ = true;
 }
 
 void NetworkActor::SwapMat() {
@@ -185,7 +190,7 @@ void NetworkActor::SetControls(Controls controls) {
 
     // Apply control to vehicle
     vehicle_->controls_ = controls;
-    URHO3D_LOGDEBUG("NetworkActor::SetControls -> applying to physics world.");
+//    URHO3D_LOGDEBUG("NetworkActor::SetControls -> applying to physics world.");
 
 }
 

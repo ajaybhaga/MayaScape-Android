@@ -266,7 +266,7 @@ void Server::UpdatePhysicsPreStep(const Controls &controls)
 
             if (clientObj)
             {
-                URHO3D_LOGINFOF("Server: set controls for client [%d] -> %s", clientNode->GetID(), ToStringHex(controls.buttons_).CString());
+//                URHO3D_LOGINFOF("Server: set controls for client [%d] -> %s", clientNode->GetID(), ToStringHex(controls.buttons_).CString());
 
                 clientObj->SetControls(controls);
                 // Apply control to actor
@@ -327,6 +327,9 @@ void Server::HandleClientIdentity(StringHash eventType, VariantMap& eventData)
     // Create player for new client
     CreatePlayer(newConnection);
     serverObjects_[newConnection] = clientObject;
+
+    URHO3D_LOGINFOF("Server: Client players -> %d", serverObjects_.Size());
+
 
     // Output the updated login list
     OutputLoginListToConsole();
@@ -454,6 +457,8 @@ void Server::DestroyPlayer(Connection* connection) {
 
     serverObjects_.Erase(connection);
     actorMap_.Erase(connection);
+
+    scene_->Clear(true, false);
 
     // Remove raycast vehicle -> to prevent bullet physics crash
 }
