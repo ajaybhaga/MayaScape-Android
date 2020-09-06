@@ -258,6 +258,8 @@ private:
     SharedPtr<Text> rpmBarText_;
     SharedPtr<Text> velBarText_;
 
+    SharedPtr<Text3D> plyFltText_;
+
     /// Strings printed so far.
     Vector<String> chatHistory_;
     /// Chat text element.

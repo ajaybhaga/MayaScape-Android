@@ -1284,6 +1284,16 @@ void MayaScape::CreateScene() {
 
 
 
+    // create text3d client info node LOCALLY
+    Node* plyFltTextNode = scene_->CreateChild("Player Float Text", LOCAL);
+    plyFltText_ = plyFltTextNode->CreateComponent<Text3D>(LOCAL);
+    plyFltText_->SetColor(Color::YELLOW);
+    plyFltText_->SetEffectColor(Color::BLACK);
+    plyFltText_->GetNode()->SetScale(40.0f);
+    plyFltText_->SetFont(cache->GetResource<Font>(INGAME_FONT), 12);
+    plyFltText_->SetFaceCameraMode(FC_ROTATE_XYZ);
+
+
     // Check when scene is rendered
     SubscribeToEvent(E_ENDRENDERING, URHO3D_HANDLER(MayaScape, HandleSceneRendered));
 }
@@ -2893,6 +2903,12 @@ void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
 //                    URHO3D_LOGINFO("--- Retrieved NetworkActor.");
                     SetAerialCamera(actorNode->GetPosition(), actorNode->GetRotation().YawAngle());
 
+                    if (plyFltText_) {
+                        plyFltText_->SetText("Molly");
+                        plyFltText_->GetNode()->SetPosition(actorNode->GetPosition() + Vector3(-15.0f, 10.0f, -5));
+                    }
+
+
 
                 } else {
                     URHO3D_LOGINFO("--- Could not get NetworkActor, aborting.");
@@ -3228,6 +3244,9 @@ void MayaScape::HandleConnect(StringHash eventType, VariantMap &eventData) {
         URHO3D_LOGINFOF("client idx=%i, username=%s", idx, name.CString());
 
 //         server-
+
+
+        // Clear client replicated objects
         scene_->Clear(true, false);
 
     } else {
