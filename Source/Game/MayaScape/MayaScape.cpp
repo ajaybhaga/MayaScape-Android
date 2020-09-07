@@ -1004,7 +1004,7 @@ void MayaScape::CreateScene() {
     terrainNode->SetPosition(Vector3::ZERO);
     terrain_ = terrainNode->CreateComponent<Terrain>();
     terrain_->SetPatchSize(64);
-    terrain_->SetSpacing(Vector3(2.8f, 2.2f, 2.8f));
+    terrain_->SetSpacing(Vector3(2.8f, 0.2f, 2.8f));
 //    terrain->SetSpacing(Vector3(3.0f, 0.1f, 3.0f)); // Spacing between vertices and vertical resolution of the height map
 
     //    terrain->SetHeightMap(cache->GetResource<Image>("Offroad/Terrain/HeightMapRace-257.png"));
