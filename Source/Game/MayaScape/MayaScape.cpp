@@ -636,6 +636,7 @@ void MayaScape::CreateScene() {
     cameraNode_ = scene_->CreateChild("Camera", LOCAL);
 //    cameraNode_ = new Node(context_);
     auto *camera = cameraNode_->CreateComponent<Camera>();
+    camera->SetFov(60);
     camera->SetFarClip(500.0f);
     cameraNode_->SetPosition(Vector3(0.0f, 5.0f, 0.0f));
 
@@ -2735,10 +2736,10 @@ void MayaScape::SetAerialCamera(const Vector3& target, float yaw) {
         tgt = Vector3(0.0f, 90.0f, 0.0f);
     }
     // Apply camera transformations
-    cameraNode_->SetPosition(Vector3(tgt.x_, tgt.y_+20.0f, tgt.z_));
+    cameraNode_->SetPosition(Vector3(tgt.x_, tgt.y_+14.0f, tgt.z_));
     float delta = (yaw-360.0f)-cameraNode_->GetRotation().YawAngle();
 //    URHO3D_LOGINFOF("--- yaw delta of cam vs. vehicle: %f", delta);
-    cameraNode_->SetRotation(Quaternion(75.0f, cameraNode_->GetRotation().YawAngle()+(delta*0.98f), 0.0f));
+    cameraNode_->SetRotation(Quaternion(60.0f, cameraNode_->GetRotation().YawAngle()+(delta*0.98f), 0.0f));
 
 
 //    URHO3D_LOGINFOF("--- yaw: %f", yaw);
