@@ -104,7 +104,7 @@ void NetworkActor::ApplyAttributes() {
 }
 
 void NetworkActor::DelayedStart() {
-    Create();
+    //Create();
 }
 
 // This will be run by server to create server objects (running the physics world)

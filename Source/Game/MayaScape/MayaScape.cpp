@@ -1472,7 +1472,7 @@ void MayaScape::HandlePlayerStateUpdate(StringHash eventType, VariantMap& eventD
     playerObjectID_ = id;
     playerVehicleID_ = vehicleId;
 
-//    URHO3D_LOGINFOF("Client -> HandlePlayerStateUpdate: %d, %d, %f, %f, %f", id, life, rpm, velocity, steer);
+    URHO3D_LOGINFOF("Client -> HandlePlayerStateUpdate: %d, %d, %d, %f, %f, %f", id, vehicleId, life, rpm, velocity, steer);
 }
 
 
@@ -2780,10 +2780,14 @@ void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
 
                 actorNode = scene_->GetNode(playerObjectID_);
                 Node* vNode = scene_->GetNode(playerVehicleID_);
-                RigidBody* rb = vNode->GetComponent<RigidBody>(true);
+                if (vNode) {
+                    RigidBody *rb = vNode->GetComponent<RigidBody>(true);
 
-                if (rb) {
-                    URHO3D_LOGINFOF("--- Found rigid body: %u at (%f, %f, %f)", playerVehicleID_, rb->GetNode()->GetPosition().x_, rb->GetNode()->GetPosition().y_, rb->GetNode()->GetPosition().z_);
+                    if (rb) {
+                        URHO3D_LOGINFOF("--- Found rigid body: %u at (%f, %f, %f)", playerVehicleID_,
+                                        rb->GetNode()->GetPosition().x_, rb->GetNode()->GetPosition().y_,
+                                        rb->GetNode()->GetPosition().z_);
+                    }
                 }
                 if (actorNode) {
 
@@ -2909,7 +2913,7 @@ void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
 //                    URHO3D_LOGINFO("--- Retrieved NetworkActor.");
                     SetAerialCamera(actorNode->GetPosition(), actorNode->GetRotation().YawAngle());
 
-                    if (plyFltText_) {
+                    if (plyFltText_->GetNode()) {
                         plyFltText_->SetText(clientName_);
                         plyFltText_->GetNode()->SetPosition(actorNode->GetPosition() + Vector3(-13.0f, 10.0f, -5));
                     }
@@ -3181,15 +3185,14 @@ void MayaScape::HandleConnect(StringHash eventType, VariantMap &eventData) {
     identity["UserName"] = name;
     identity["ColorIdx"] = idx;
 
-    scene_->Clear(true, false);
-
     // Client connect to server
     if (server->Connect(address, SERVER_PORT, identity)) {
 
         URHO3D_LOGINFOF("client identity name=%s", name.CString());
         URHO3D_LOGINFOF("HandleClientConnected - data: [%s, %d]", name.CString(), idx);
 
-  //      CreateScene();
+        // Clear client replicated objects
+        scene_->MarkNetworkUpdate();
 
         // Store in local login list
         loginList_.Push(name.CString());
@@ -3252,8 +3255,6 @@ void MayaScape::HandleConnect(StringHash eventType, VariantMap &eventData) {
 //         server-
 
 
-        // Clear client replicated objects
-        scene_->Clear(true, false);
 
     } else {
         URHO3D_LOGINFOF("Connection to server failed =%s", address.CString());
