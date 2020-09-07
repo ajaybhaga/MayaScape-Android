@@ -104,7 +104,7 @@ void NetworkActor::ApplyAttributes() {
 }
 
 void NetworkActor::DelayedStart() {
-    //Create();
+    Create();
 }
 
 // This will be run by server to create server objects (running the physics world)
@@ -114,7 +114,7 @@ void NetworkActor::Create() {
             ResourceCache *cache = GetSubsystem<ResourceCache>();
 
             // Init vehicle
-            Node *vehicleNode = GetScene()->CreateChild("Vehicle", REPLICATED);
+            Node *vehicleNode = GetScene()->CreateChild("Vehicle", LOCAL);
 
             // Default at (0,300,0) above terrain before we set location
             float factor = 500.0f;
@@ -135,7 +135,7 @@ void NetworkActor::Create() {
             // physics components
 //    pRigidBody_->SetUseGravity(false);
 
-            pRigidBody_ = vehicleNode->GetOrCreateComponent<RigidBody>(REPLICATED);
+            pRigidBody_ = GetNode()->CreateComponent<RigidBody>(REPLICATED);
             /* pRigidBody_->SetCollisionLayer(NETWORKACTOR_COL_LAYER);
              pRigidBody_->SetMass(mass_);
              pRigidBody_->SetFriction(1.0f);

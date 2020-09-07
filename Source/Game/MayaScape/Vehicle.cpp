@@ -375,7 +375,7 @@ void Vehicle::Create() {
 
 
     // init sound
-    engineSoundSrc_ = node_->CreateComponent<SoundSource3D>();
+    engineSoundSrc_ = node_->CreateComponent<SoundSource3D>(LOCAL);
     engineSnd_ = cache->GetResource<Sound>("Offroad/Sounds/engine-prototype.ogg");
     engineSnd_->SetLooped(true);
 
@@ -385,14 +385,14 @@ void Vehicle::Create() {
     engineSoundSrc_->Play(engineSnd_);
     engineSoundSrc_->SetFrequency(AUDIO_FIXED_FREQ_44K * 0.05f);
 
-    skidSoundSrc_ = node_->CreateComponent<SoundSource3D>();
+    skidSoundSrc_ = node_->CreateComponent<SoundSource3D>(LOCAL);
     skidSnd_ = cache->GetResource<Sound>("Offroad/Sounds/skid-gravel.ogg");
     skidSoundSrc_->SetSoundType(SOUND_EFFECT);
     skidSoundSrc_->SetGain(0.1f);
     skidSoundSrc_->SetDistanceAttenuation( 1.0f, 3000.0f, 0.1f );
     skidSoundSrc_->SetFrequency(AUDIO_FIXED_FREQ_44K * 1.4f );
 
-    shockSoundSrc_ = node_->CreateComponent<SoundSource3D>();
+    shockSoundSrc_ = node_->CreateComponent<SoundSource3D>(LOCAL);
     shockSnd_ = cache->GetResource<Sound>("Offroad/Sounds/shocks-impact.ogg");
     shockSoundSrc_->SetSoundType(SOUND_EFFECT);
     shockSoundSrc_->SetGain(0.2f);
