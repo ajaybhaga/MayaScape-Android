@@ -204,8 +204,8 @@ void Server::UpdateActors(float timeStep) {
                     actor->FixedUpdate(timeStep);
 
                     // If actor has a vehicle, snap the actor to vehicle
-                    if (actor->vehicle_)
-                        actor->GetNode()->SetPosition(actor->vehicle_->GetNode()->GetPosition());
+                   // if (actor->vehicle_)
+                   //     actor->GetNode()->SetPosition(actor->vehicle_->GetNode()->GetPosition());
 
                     // TODO: Add delay for player state?
                     SendPlayerStateMsg(connection);
@@ -289,8 +289,8 @@ void Server::SendPlayerStateMsg(Connection* connection)
 
         // Send the event forward
         VariantMap &newEventData = GetEventDataMap();
-        newEventData[P_ID] = actor->GetVehicle()->GetID();
-        newEventData[P_RB_ID] = actor->pRigidBody_->GetID();
+        newEventData[P_ID] = actor->GetID();
+        newEventData[P_VEHICLE_ID] = actor->GetVehicle()->GetID();
         newEventData[P_LIFE] = actor->GetLife();
         if (actor->GetVehicle()) {
             newEventData[P_RPM] = actor->GetVehicle()->GetCurrentRPM();
@@ -311,6 +311,7 @@ void Server::HandleClientIdentity(StringHash eventType, VariantMap& eventData)
 
     // When a client connects, assign to scene to begin scene replication
     Connection* newConnection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
+    scene_->Clear(true, false);
     newConnection->SetScene(scene_);
 
     URHO3D_LOGINFO("HandleClientIdentity - client assigned for scene replication.");

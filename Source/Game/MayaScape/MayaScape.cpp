@@ -1462,7 +1462,7 @@ void MayaScape::HandlePlayerStateUpdate(StringHash eventType, VariantMap& eventD
 
     using namespace ClientPlayerState;
     int id = eventData[P_ID].GetUInt();
-    int rigidBodyId = eventData[P_RB_ID].GetUInt();
+    int vehicleId = eventData[P_VEHICLE_ID].GetUInt();
     int life = eventData[P_LIFE].GetUInt();
     float rpm = eventData[P_RPM].GetFloat();
     float velocity = eventData[P_VELOCITY].GetFloat();
@@ -1470,7 +1470,7 @@ void MayaScape::HandlePlayerStateUpdate(StringHash eventType, VariantMap& eventD
 
     // Store updated node id
     playerObjectID_ = id;
-    playerRigidBodyID_ = rigidBodyId;
+    playerVehicleID_ = vehicleId;
 
 //    URHO3D_LOGINFOF("Client -> HandlePlayerStateUpdate: %d, %d, %f, %f, %f", id, life, rpm, velocity, steer);
 }
@@ -2779,11 +2779,11 @@ void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
             if (playerObjectID_ != 0) {
 
                 actorNode = scene_->GetNode(playerObjectID_);
-                Node* rbNode = scene_->GetNode(playerRigidBodyID_);
+                Node* vNode = scene_->GetNode(playerVehicleID_);
+                RigidBody* rb = vNode->GetComponent<RigidBody>(true);
 
-
-                if (rbNode) {
-                    URHO3D_LOGINFOF("--- Found rigid body: %u at (%f, %f, %f)", playerRigidBodyID_, rbNode->GetPosition().x_, rbNode->GetPosition().y_, rbNode->GetPosition().z_);
+                if (rb) {
+                    URHO3D_LOGINFOF("--- Found rigid body: %u at (%f, %f, %f)", playerVehicleID_, rb->GetNode()->GetPosition().x_, rb->GetNode()->GetPosition().y_, rb->GetNode()->GetPosition().z_);
                 }
                 if (actorNode) {
 

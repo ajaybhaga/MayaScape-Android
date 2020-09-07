@@ -338,7 +338,7 @@ private:
 
     unsigned loginClientObjectID_; // Login client node id
     unsigned playerObjectID_; // Player object node id
-    unsigned playerRigidBodyID_; // Player rigid body id
+    unsigned playerVehicleID_; // Player vehicle node id
     bool isServer_;
 
     /// Packets in per second

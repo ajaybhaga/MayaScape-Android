@@ -415,7 +415,8 @@ void Vehicle::Init(bool isServer, Vector3 initialPos) {
     //Node* adjNode = node_->CreateChild("AdjNode", REPLICATED);
     //adjNode->SetRotation(Quaternion(0.0, 0.0, -90.0f));
 
-    node_->SetPosition(initialPos);
+    node_->SetPosition(Vector3(0,0,0));
+//    node_->SetPosition(initialPos);
 /*
     // On client
     if (!isServer) {
