@@ -207,7 +207,7 @@ void Server::UpdateActors(float timeStep) {
                     if (actor->vehicle_)
                         actor->GetNode()->SetPosition(actor->vehicle_->GetNode()->GetPosition());
 
-
+                    // TODO: Add delay for player state?
                     SendPlayerStateMsg(connection);
 
                     // Mark actor to update on network for replicate nodes
@@ -290,6 +290,7 @@ void Server::SendPlayerStateMsg(Connection* connection)
         // Send the event forward
         VariantMap &newEventData = GetEventDataMap();
         newEventData[P_ID] = actor->GetVehicle()->GetID();
+        newEventData[P_RB_ID] = actor->pRigidBody_->GetID();
         newEventData[P_LIFE] = actor->GetLife();
         if (actor->GetVehicle()) {
             newEventData[P_RPM] = actor->GetVehicle()->GetCurrentRPM();

@@ -114,7 +114,6 @@ void NetworkActor::Create() {
             ResourceCache *cache = GetSubsystem<ResourceCache>();
 
             // Init vehicle
-//            Node *vehicleNode = GetScene()->CreateChild("Vehicle", REPLICATED);
             Node *vehicleNode = GetScene()->CreateChild("Vehicle", REPLICATED);
 
             // Default at (0,300,0) above terrain before we set location

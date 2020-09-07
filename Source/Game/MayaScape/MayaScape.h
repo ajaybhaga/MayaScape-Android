@@ -338,9 +338,8 @@ private:
 
     unsigned loginClientObjectID_; // Login client node id
     unsigned playerObjectID_; // Player object node id
+    unsigned playerRigidBodyID_; // Player rigid body id
     bool isServer_;
-
-
 
     /// Packets in per second
     SharedPtr<Text> packetsIn_;
