@@ -124,7 +124,7 @@ Node* Server::CreatePlayer(Connection* connection) {
 
 
     // Store the player in map
-    actorMap_.Populate(connection, actorClientObj_);
+    actorMap_.Populate(connection, static_cast<const WeakPtr<NetworkActor>>(actorClientObj_));
 
 //    player_->GetNode()->SetPosition(Vector3(0, 0, 0));
 
@@ -192,27 +192,27 @@ void Server::UpdateActors(float timeStep) {
     {
         const Vector<SharedPtr<Connection> >& connections = network->GetClientConnections();
 
-        for (unsigned i = 0; i < connections.Size(); ++i)
-        {
-            Connection* connection = connections[i];
+        for (unsigned i = 0; i < connections.Size(); ++i) {
+            Connection *connection = connections[i];
 //            const Controls& controls = connection->GetControls();
 
             // Get the object this connection is controlling
-            NetworkActor* actor = actorMap_[connection];
+            NetworkActor *actor = actorMap_[connection];
 
             if (actor) {
-                // Apply update to actor
-                actor->FixedUpdate(timeStep);
+                    // Apply update to actor
+                    actor->FixedUpdate(timeStep);
 
-                // If actor has a vehicle, snap the actor to vehicle
-                if (actor->vehicle_)
-                    actor->GetNode()->SetPosition(actor->vehicle_->GetNode()->GetPosition());
+                    // If actor has a vehicle, snap the actor to vehicle
+                    if (actor->vehicle_)
+                        actor->GetNode()->SetPosition(actor->vehicle_->GetNode()->GetPosition());
 
 
-                SendPlayerStateMsg(connection);
+                    SendPlayerStateMsg(connection);
 
-                // Mark actor to update on network for replicate nodes
-                actor->MarkNetworkUpdate();
+                    // Mark actor to update on network for replicate nodes
+                    actor->MarkNetworkUpdate();
+
             }
         }
     }
@@ -258,6 +258,9 @@ void Server::UpdatePhysicsPreStep(const Controls &controls)
             if (clientObj)
             {
 //                URHO3D_LOGINFOF("Server: set controls for client [%d] -> %s", clientNode->GetID(), ToStringHex(controls.buttons_).CString());
+
+                // TODO: Instead of applying controls right away - add to input buffer
+                // Based on input buffer size, control client input demand
 
                 clientObj->SetControls(controls);
                 // Apply control to actor
@@ -415,8 +418,10 @@ void Server::HandleClientConnected(StringHash eventType, VariantMap& eventData)
 
 void Server::DestroyPlayer(Connection* connection) {
 
+    // NetworkActor nodes
     Node* object = serverObjects_[connection];
-    NetworkActor* actor = actorMap_[connection];
+
+/*    NetworkActor* actor = actorMap_[connection];*/
 
 
     if (object)
@@ -425,13 +430,14 @@ void Server::DestroyPlayer(Connection* connection) {
         object->RemoveAllChildren();
         object->Remove();
     }
-
+/*
     if (actor)
     {
+        actor->SetEnabled(false);
         URHO3D_LOGINFOF("**** DESTROYING CLIENT NETWORK ACTOR OBJECT -> %d", actor->GetID());
         actor->Remove();
     }
-
+*/
     Vector<Connection*> connectList = loginList_.Values();
 
     URHO3D_LOGINFO("**** FINDING CONNECTION TO REMOVE FROM LOGIN LIST");

@@ -196,7 +196,7 @@ void Vehicle::Create() {
     raycastVehicle_->SetEnabled(true);
 
     hullColShape_ = node_->CreateComponent<CollisionShape>(REPLICATED);
-    hullObject_ = node_->CreateComponent<StaticModel>(REPLICATED);
+    hullObject_ = node_->CreateComponent<StaticModel>(LOCAL);
 
 //    raycastVehicle_->GetNode()->SetScale(3.0f);
 
@@ -323,7 +323,7 @@ void Vehicle::Create() {
             Quaternion qRot = raycastVehicle_->GetWheelRotation(i);
 
             // wheel node
-            Node *wheelNode = GetScene()->CreateChild("wheel", REPLICATED);
+            Node *wheelNode = GetScene()->CreateChild("wheel", LOCAL);
             m_vpNodeWheel.Push( wheelNode );
 
             wheelNode->SetPosition( v3Origin );
@@ -336,11 +336,11 @@ void Vehicle::Create() {
             //wheelThickness = 1.0f
             wheelNode->SetScale(Vector3(tireScaleXZ,wheelThickness,tireScaleXZ));
 
-            Node* adjNode = wheelNode->CreateChild("AdjNode", REPLICATED);
+            Node* adjNode = wheelNode->CreateChild("AdjNode", LOCAL);
             adjNode->SetRotation(Quaternion(0.0, 0.0, -90.0f));
 
             // tire model
-            StaticModel *pWheel = adjNode->CreateComponent<StaticModel>(REPLICATED);
+            StaticModel *pWheel = adjNode->CreateComponent<StaticModel>(LOCAL);
             //pWheel->GetNode()->SetScale(0.4f);
             pWheel->SetModel(tireModel);
             pWheel->ApplyMaterialList("Models/Vehicles/Offroad/Models/wheel-fl.txt");

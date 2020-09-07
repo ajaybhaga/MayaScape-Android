@@ -90,6 +90,8 @@ NetworkActor::~NetworkActor() {
         URHO3D_LOGINFOF("**** DESTROYING CLIENT RIGID BODY OBJECT -> %d", this->id_);
         pRigidBody_->Remove();
     }
+
+    created_ = false;
 }
 
 void NetworkActor::RegisterObject(Context *context) {
@@ -123,8 +125,8 @@ void NetworkActor::Create() {
             vehicleNode->SetPosition(Vector3(0,0,0));
 
             // Create the vehicle logic component
-            vehicle_ = vehicleNode->CreateComponent<Vehicle>();
-            vehicle_->Init(isServer_, Vector3(-814.0f+Random(-400.f, 400.0f), 500.0f, -595.0f+Random(-400.f, 400.0f)));
+            vehicle_ = vehicleNode->CreateComponent<Vehicle>(LOCAL);
+            vehicle_->Init(isServer_, Vector3(-814.0f+Random(-400.f, 400.0f), 100.0f, -595.0f+Random(-400.f, 400.0f)));
             vehicle_->Create();
 //        GetNode()->SetPosition(vehicle_->GetNode()->GetPosition());
 
@@ -134,7 +136,7 @@ void NetworkActor::Create() {
             // physics components
 //    pRigidBody_->SetUseGravity(false);
 
-            pRigidBody_ = vehicleNode->GetOrCreateComponent<RigidBody>(LOCAL);
+            pRigidBody_ = vehicleNode->GetOrCreateComponent<RigidBody>(REPLICATED);
             /* pRigidBody_->SetCollisionLayer(NETWORKACTOR_COL_LAYER);
              pRigidBody_->SetMass(mass_);
              pRigidBody_->SetFriction(1.0f);
@@ -199,7 +201,7 @@ void NetworkActor::SetControls(Controls controls) {
 }
 
 void NetworkActor::FixedUpdate(float timeStep) {
-    if (!pRigidBody_ || !nodeInfo_) {
+    if (!pRigidBody_ || !nodeInfo_ || !created_) {
         return;
     }
 

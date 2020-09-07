@@ -116,7 +116,7 @@ protected:
     unsigned clientObjectID_;
     SharedPtr<Scene> scene_;
 
-    HashMap<Connection*, NetworkActor*> actorMap_;
+    HashMap<Connection*, WeakPtr<NetworkActor>> actorMap_;
     HashMap<String, Connection*> loginList_;
 
     WeakPtr<Node> app_;
