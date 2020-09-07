@@ -1287,7 +1287,7 @@ void MayaScape::CreateScene() {
     // create text3d client info node LOCALLY
     Node* plyFltTextNode = scene_->CreateChild("Player Float Text", LOCAL);
     plyFltText_ = plyFltTextNode->CreateComponent<Text3D>(LOCAL);
-    plyFltText_->SetColor(Color::YELLOW);
+    plyFltText_->SetColor(Color::GREEN);
     plyFltText_->SetEffectColor(Color::BLACK);
     plyFltText_->GetNode()->SetScale(40.0f);
     plyFltText_->SetFont(cache->GetResource<Font>(INGAME_FONT), 12);
@@ -2904,8 +2904,8 @@ void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
                     SetAerialCamera(actorNode->GetPosition(), actorNode->GetRotation().YawAngle());
 
                     if (plyFltText_) {
-                        plyFltText_->SetText("Molly");
-                        plyFltText_->GetNode()->SetPosition(actorNode->GetPosition() + Vector3(-15.0f, 10.0f, -5));
+                        plyFltText_->SetText(clientName_);
+                        plyFltText_->GetNode()->SetPosition(actorNode->GetPosition() + Vector3(-13.0f, 10.0f, -5));
                     }
 
 
