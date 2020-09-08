@@ -86,11 +86,6 @@ NetworkActor::~NetworkActor() {
         nodeInfo_->Remove();
     }
 
-    if (pRigidBody_) {
-        URHO3D_LOGINFOF("**** DESTROYING CLIENT RIGID BODY OBJECT -> %d", this->id_);
-        pRigidBody_->Remove();
-    }
-
     created_ = false;
 }
 
@@ -132,41 +127,16 @@ void NetworkActor::Create() {
             wpActiveIndex_ = 0;
             targetAgentIndex_ = 0;
 
-            // physics components
-//    pRigidBody_->SetUseGravity(false);
-
-            pRigidBody_ = GetNode()->CreateComponent<RigidBody>(REPLICATED);
-            /* pRigidBody_->SetCollisionLayer(NETWORKACTOR_COL_LAYER);
-             pRigidBody_->SetMass(mass_);
-             pRigidBody_->SetFriction(1.0f);
-             pRigidBody_->SetLinearDamping(0.5f);
-             pRigidBody_->SetAngularDamping(0.5f);
-             CollisionShape* shape = vehicleNode->GetOrCreateComponent<CollisionShape>(LOCAL);
-             shape->SetSphere(1.0f);*/
             vehicleNode->SetRotation(Quaternion(0.0, -90.0, 0.0));
 
-
             // create text3d client info node LOCALLY
-            nodeInfo_ = GetNode()->CreateChild("light", LOCAL);
+            nodeInfo_ = GetNode()->CreateChild("Float Text", LOCAL);
             floatingText_ = nodeInfo_->CreateComponent<Text3D>();
             floatingText_->SetColor(Color::GREEN);
             floatingText_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 20);
             floatingText_->SetFaceCameraMode(FC_ROTATE_XYZ);
-            // create text3d client info node LOCALLY
-//    nodeInfo_ = GetScene()->CreateChild("light", LOCAL);
-
-
-/*
-
-    Text3D *text3D = nodeInfo_->CreateComponent<Text3D>();
-    text3D->SetColor(Color::GREEN);
-    text3D->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 40);
-    text3D->SetText(userName_);
-    text3D->SetFaceCameraMode(FC_ROTATE_XYZ);
-*/
             // register
             SetUpdateEventMask(USE_FIXEDUPDATE);
-
     }
 
     // Instance created
@@ -200,7 +170,7 @@ void NetworkActor::SetControls(Controls controls) {
 }
 
 void NetworkActor::FixedUpdate(float timeStep) {
-    if (!pRigidBody_ || !nodeInfo_ || !created_) {
+    if (!nodeInfo_ || !created_) {
         return;
     }
 
@@ -375,7 +345,7 @@ void NetworkActor::ComputeSteerForce() {
     if (!waypoints_)
         return;
 
-    if ((!pRigidBody_) || (waypoints_->Empty())) {
+    if ((waypoints_->Empty())) {
         return;
     }
     //Attraction force
@@ -458,7 +428,7 @@ void NetworkActor::ComputeSteerForce() {
 //        URHO3D_LOGDEBUGF("Player::ComputeSteerForce() waypoints -> [%d] -> set to  %d", waypoints_->Size(), wpActiveIndex_);
 
         // Calculate distance to waypoint
-        toTarget = pRigidBody_->GetPosition() - waypoints_->At(wpActiveIndex_);
+        toTarget = vehicle_->GetNode()->GetPosition() - waypoints_->At(wpActiveIndex_);
     } else {
         return;
     }
@@ -480,7 +450,7 @@ void NetworkActor::ComputeSteerForce() {
         nAlign++;
     }*/
 
-    force_ += (desiredVelocity - pRigidBody_->GetLinearVelocity());
+    force_ += ToVector3(ToBtVector3(desiredVelocity) - vehicle_->GetRaycastVehicle()->GetBody()->getLinearVelocity());
 
     /*
     if (nAlign > 0)

@@ -144,13 +144,11 @@ public:
     virtual void FixedUpdate(float timeStep);
 
     String name_;
-    WeakPtr<RigidBody> pRigidBody_;
     WeakPtr<Node> nodeInfo_;
     Controls prevControls_;
-    ////
+
     /// The controllable vehicle component.
     SharedPtr<Vehicle> vehicle_;
-
     SharedPtr<Text3D> floatingText_;
 
     bool isServer_;
