@@ -311,7 +311,7 @@ void Server::HandleClientIdentity(StringHash eventType, VariantMap& eventData)
 
     // When a client connects, assign to scene to begin scene replication
     Connection* newConnection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
-    scene_->Clear(true, false);
+//    scene_->Clear(true, false);
     newConnection->SetScene(scene_);
 
     URHO3D_LOGINFO("HandleClientIdentity - client assigned for scene replication.");
