@@ -329,6 +329,8 @@ void Server::HandleClientIdentity(StringHash eventType, VariantMap& eventData)
     // Output the updated login list
     OutputLoginListToConsole();
 
+//    scene_->MarkReplicationDirty(scene_->GetParent());
+
     // Finally send the object's node ID using a remote event
     VariantMap remoteEventData;
     remoteEventData[ClientObjectID::P_ID] = clientObject->GetID();
@@ -461,6 +463,7 @@ void Server::DestroyPlayer(Connection* connection) {
 
     // Clear removed replicated nodes
     scene_->Clear(true, false);
+//    scene_->MarkReplicationDirty(scene_);
 }
 
 void Server::HandleClientDisconnected(StringHash eventType, VariantMap& eventData)
