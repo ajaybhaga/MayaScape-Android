@@ -1371,8 +1371,9 @@ void MayaScape::HandleClientSceneLoaded(StringHash eventType, VariantMap& eventD
     URHO3D_LOGINFO("HandleClientSceneLoaded");
     URHO3D_LOGINFOF("Client: Scene checksum -> %s", ToStringHex(scene_->GetChecksum()).CString());
 
+
     // Clear existing replicated nodes on client
-    scene_->Clear(true,false);
+  //  scene_->Clear(true,false);
 
 
 }
