@@ -325,6 +325,7 @@ void Server::HandleClientIdentity(StringHash eventType, VariantMap& eventData)
 
     URHO3D_LOGINFOF("Server: Client players -> %d", serverObjects_.Size());
 
+    newConnection->SetScene(scene_);
 
     // Output the updated login list
     OutputLoginListToConsole();
@@ -333,7 +334,6 @@ void Server::HandleClientIdentity(StringHash eventType, VariantMap& eventData)
     VariantMap remoteEventData;
     remoteEventData[ClientObjectID::P_ID] = clientObject->GetID();
     newConnection->SendRemoteEvent(E_CLIENTOBJECTID, true, remoteEventData);
-    newConnection->SetScene(scene_);
 
 }
 
