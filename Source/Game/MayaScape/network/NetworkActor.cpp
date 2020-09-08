@@ -109,7 +109,7 @@ void NetworkActor::Create() {
             ResourceCache *cache = GetSubsystem<ResourceCache>();
 
             // Init vehicle
-            Node *vehicleNode = GetScene()->CreateChild("Vehicle", LOCAL);
+            Node *vehicleNode = GetScene()->CreateChild("Vehicle", REPLICATED);
 
             // Default at (0,300,0) above terrain before we set location
             float factor = 500.0f;
@@ -119,7 +119,7 @@ void NetworkActor::Create() {
             vehicleNode->SetPosition(Vector3(0,0,0));
 
             // Create the vehicle logic component
-            vehicle_ = vehicleNode->CreateComponent<Vehicle>(LOCAL);
+            vehicle_ = vehicleNode->CreateComponent<Vehicle>(REPLICATED);
             vehicle_->Init(isServer_, Vector3(-814.0f+Random(-400.f, 400.0f), 100.0f, -595.0f+Random(-400.f, 400.0f)));
             vehicle_->Create();
 //        GetNode()->SetPosition(vehicle_->GetNode()->GetPosition());
@@ -182,13 +182,7 @@ void NetworkActor::FixedUpdate(float timeStep) {
 
     // Only allow server to control objects based on received controls from clients
     if (isServer_) {
-
-//        vehicle_->GetNode()->SetPosition(Vector3(0, 300, 0));
-
-        // Get updated controls
-//    actor->GetControls();
-//        URHO3D_LOGINFOF("NetworkActor: FixedUpdate - applying controls for client [%d] -> %s", GetID(),
-//                        ToStringHex(controls_.buttons_).CString());
+        // SERVER CODE
 
         // Snap network actor position/rotation to vehicle
         if (vehicle_) {
@@ -196,17 +190,7 @@ void NetworkActor::FixedUpdate(float timeStep) {
             GetNode()->SetRotation(vehicle_->GetNode()->GetRotation());
         }
 
-        // TODO: 3d text not showing up
-        nodeInfo_->SetPosition(GetNode()->GetPosition() + Vector3(0.0f, 1.1f, 0.0f));
-//    floatingText_->SetEnabled(true);
-        // update text pos
-//    nodeInfo_->SetPosition(node_->GetPosition() + Vector3(0.0f, 0.7f, 0.0f));
-
-        // update text pos
-        nodeInfo_->SetPosition(node_->GetPosition() + Vector3(0.0f, 0.7f, 0.0f));
-
-
-        /// Clients should not update the component on its own
+        /// Clients should not update the component on its own (server will handle it)
 
         // Read control data and apply to vehicle controller
         Node *node = GetNode();

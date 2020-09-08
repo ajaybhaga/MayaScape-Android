@@ -192,7 +192,7 @@ void Vehicle::Create() {
 
 //    Node *vehicleNode = GetScene()->CreateChild("Vehicle", LOCAL);
 
-    raycastVehicle_ = node_->CreateComponent<RaycastVehicle>(LOCAL);
+    raycastVehicle_ = node_->CreateComponent<RaycastVehicle>(REPLICATED);
     raycastVehicle_->SetEnabled(true);
 
     hullColShape_ = node_->CreateComponent<CollisionShape>(REPLICATED);

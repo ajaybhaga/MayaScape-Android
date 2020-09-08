@@ -3185,6 +3185,9 @@ void MayaScape::HandleConnect(StringHash eventType, VariantMap &eventData) {
     identity["UserName"] = name;
     identity["ColorIdx"] = idx;
 
+    // Clear existing replicated nodes on client
+    scene_->Clear(true, false);
+
     // Client connect to server
     if (server->Connect(address, SERVER_PORT, identity)) {
 
