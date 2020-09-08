@@ -369,6 +369,8 @@ void Server::HandleNetworkUpdateSent(StringHash eventType, VariantMap& eventData
                 {
                     clientObj->ClearControls();
                 }
+
+                scene_->Clear(true, false);
             }
         }
     } else {
