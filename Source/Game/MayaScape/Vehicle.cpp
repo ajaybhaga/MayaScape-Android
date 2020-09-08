@@ -406,7 +406,7 @@ void Vehicle::Create() {
 // This function is called only from the main program when initially creating 
 // the vehicle, not on scene load
 //=============================================================================
-void Vehicle::Init(bool isServer, Vector3 initialPos) {
+void Vehicle::Init(bool isServer) {
 
     // node collision
     SubscribeToEvent(GetNode(), E_NODECOLLISION, URHO3D_HANDLER(Vehicle, HandleVehicleCollision));
@@ -415,7 +415,7 @@ void Vehicle::Init(bool isServer, Vector3 initialPos) {
     //Node* adjNode = node_->CreateChild("AdjNode", REPLICATED);
     //adjNode->SetRotation(Quaternion(0.0, 0.0, -90.0f));
 
-    node_->SetPosition(Vector3(0,0,0));
+//    node_->SetPosition(Vector3(0,0,0));
 //    node_->SetPosition(initialPos);
 /*
     // On client

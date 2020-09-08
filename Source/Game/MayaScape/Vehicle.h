@@ -79,7 +79,7 @@ public:
     virtual void ApplyAttributes();
 
     /// Initialize the vehicle. Create rendering and physics components. Called by the application.
-    void Init(bool isServer, Vector3 initialPos);
+    void Init(bool isServer);
     void Create();
 
     /// Handle physics world update. Called by LogicComponent base class.

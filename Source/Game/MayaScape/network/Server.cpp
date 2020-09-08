@@ -289,8 +289,8 @@ void Server::SendPlayerStateMsg(Connection* connection)
 
         // Send the event forward
         VariantMap &newEventData = GetEventDataMap();
-        newEventData[P_ID] = actor->GetID();
-        newEventData[P_VEHICLE_ID] = actor->GetVehicle()->GetID();
+        newEventData[P_ID] = actor->GetNode()->GetID();
+        newEventData[P_VEHICLE_ID] = actor->GetVehicle()->GetNode()->GetID();
         newEventData[P_LIFE] = actor->GetLife();
         if (actor->GetVehicle()) {
             newEventData[P_RPM] = actor->GetVehicle()->GetCurrentRPM();
