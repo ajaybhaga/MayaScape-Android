@@ -596,7 +596,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
     }
 
     unsigned nodeIDx = msg.ReadNetID();
-    URHO3D_LOGINFOF("PROCESS SCENE UPDATE: %u", nodeIDx);
+    URHO3D_LOGINFOF("PROCESS SCENE UPDATE: %u checksum %s", nodeIDx, ToStringHex(scene_->GetChecksum()).CString());
 
     if (!scene_)
         return;

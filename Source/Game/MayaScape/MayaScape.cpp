@@ -3203,7 +3203,7 @@ void MayaScape::HandleConnect(StringHash eventType, VariantMap &eventData) {
         URHO3D_LOGINFOF("HandleClientConnected - data: [%s, %d]", name.CString(), idx);
 
         // Clear client replicated objects
-        scene_->MarkNetworkUpdate();
+//        scene_->MarkNetworkUpdate();
 
         // Store in local login list
         loginList_.Push(name.CString());
@@ -3265,6 +3265,7 @@ void MayaScape::HandleConnect(StringHash eventType, VariantMap &eventData) {
 
 //         server-
 
+    //    scene_->Clear(true, false);
 
 
     } else {

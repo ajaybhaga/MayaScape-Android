@@ -356,10 +356,11 @@ void Server::HandleNetworkUpdateSent(StringHash eventType, VariantMap& eventData
     // Client: collect controls
     if (serverConnection)
     {
+        // CLIENT CODE
         if (clientObjectID_)
         {
 
-            Node *clientNode = scene_->GetNode(clientObjectID_);
+            Node *clientNode = serverConnection->GetScene()->GetNode(clientObjectID_);
 
             if (clientNode)
             {
@@ -369,7 +370,7 @@ void Server::HandleNetworkUpdateSent(StringHash eventType, VariantMap& eventData
                 if (networkActor)
                 {
                     networkActor->ClearControls();
-                    //scene_->Clear(true, false);
+                 //   serverConnection->GetScene()->Clear(true, false);
                 }
             }
         }
