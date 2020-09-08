@@ -311,8 +311,6 @@ void Server::HandleClientIdentity(StringHash eventType, VariantMap& eventData)
 
     // When a client connects, assign to scene to begin scene replication
     Connection* newConnection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
-    scene_->Clear(true, false);
-    newConnection->SetScene(scene_);
 
     URHO3D_LOGINFO("HandleClientIdentity - client assigned for scene replication.");
     URHO3D_LOGINFOF("Server: Scene checksum -> %s", ToStringHex(scene_->GetChecksum()).CString());
@@ -335,6 +333,8 @@ void Server::HandleClientIdentity(StringHash eventType, VariantMap& eventData)
     VariantMap remoteEventData;
     remoteEventData[ClientObjectID::P_ID] = clientObject->GetID();
     newConnection->SendRemoteEvent(E_CLIENTOBJECTID, true, remoteEventData);
+    newConnection->SetScene(scene_);
+
 }
 
 void Server::HandleClientSceneLoaded(StringHash eventType, VariantMap& eventData)
