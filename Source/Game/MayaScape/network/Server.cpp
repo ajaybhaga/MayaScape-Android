@@ -358,16 +358,17 @@ void Server::HandleNetworkUpdateSent(StringHash eventType, VariantMap& eventData
         if (clientObjectID_)
         {
 
-            Node *clientNode = scene_->GetChild(clientObjectID_);
+            Node *clientNode = scene_->GetNode(clientObjectID_);
 
             if (clientNode)
             {
 
-                ClientObj *clientObj = clientNode->GetDerivedComponent<ClientObj>();
+                NetworkActor *networkActor = clientNode->GetDerivedComponent<NetworkActor>();
 
-                if (clientObj)
+                if (networkActor)
                 {
-                    clientObj->ClearControls();
+                    networkActor->ClearControls();
+                    //scene_->Clear(true, false);
                 }
             }
         }

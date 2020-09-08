@@ -1371,6 +1371,10 @@ void MayaScape::HandleClientSceneLoaded(StringHash eventType, VariantMap& eventD
     URHO3D_LOGINFO("HandleClientSceneLoaded");
     URHO3D_LOGINFOF("Client: Scene checksum -> %s", ToStringHex(scene_->GetChecksum()).CString());
 
+    // Clear existing replicated nodes on client
+    scene_->Clear(true,false);
+
+
 }
 
 void MayaScape::SubscribeToEvents() {
@@ -1473,6 +1477,7 @@ void MayaScape::HandlePlayerStateUpdate(StringHash eventType, VariantMap& eventD
     playerVehicleID_ = vehicleId;
 
     URHO3D_LOGINFOF("Client -> HandlePlayerStateUpdate: %d, %d, %d, %f, %f, %f", id, vehicleId, life, rpm, velocity, steer);
+
 }
 
 
@@ -3185,8 +3190,6 @@ void MayaScape::HandleConnect(StringHash eventType, VariantMap &eventData) {
     identity["UserName"] = name;
     identity["ColorIdx"] = idx;
 
-    // Clear existing replicated nodes on client
-    scene_->Clear(true, false);
 
     // Client connect to server
     if (server->Connect(address, SERVER_PORT, identity)) {
@@ -3341,6 +3344,8 @@ void MayaScape::HandleClientObjectID(StringHash eventType, VariantMap &eventData
 
     URHO3D_LOGINFOF("Client -> scene checksum: %d", ToStringHex(scene_->GetChecksum()).CString());
 
+    // Clear existing replicated nodes on client
+    scene_->Clear(true,false);
 
     auto *network = GetSubsystem<Network>();
     Connection *serverConnection = network->GetServerConnection();
