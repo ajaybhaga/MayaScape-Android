@@ -111,6 +111,9 @@ void Server::Disconnect()
 }
 
 Node* Server::CreatePlayer(Connection* connection) {
+    // set identity
+    if (connection)
+    {
 
     Node *playerNode = scene_->CreateChild("Player", REPLICATED);
 
@@ -136,9 +139,6 @@ Node* Server::CreatePlayer(Connection* connection) {
 
     playerNode->SetRotation(Quaternion(0.0, -0.0, -0.0));
 
-    // set identity
-    if (connection)
-    {
         String name = connection->identity_["UserName"].GetString();
         int colorIdx = connection->identity_["ColorIdx"].GetInt();
         actorClientObj_->SetClientInfo(name, colorIdx);
@@ -147,8 +147,10 @@ Node* Server::CreatePlayer(Connection* connection) {
         URHO3D_LOGINFOF("HandleClientConnected - data: [%s, %d]", name.CString(), colorIdx);
         // Store login name with connection
         loginList_.Populate(name.CString(), connection);
+        return playerNode;
     }
 
+    return nullptr;
 
     /*
     // Register player on CSP server
@@ -162,7 +164,6 @@ Node* Server::CreatePlayer(Connection* connection) {
     // Assign player node to csp snapshot
     csp->add_node(playerNode);*/
 
-    return playerNode;
 }
 
 void Server::SubscribeToEvents()
@@ -304,14 +305,13 @@ void Server::SendPlayerStateMsg(Connection* connection)
     }
 }
 
-void Server::HandleClientIdentity(StringHash eventType, VariantMap& eventData)
-{
-	using namespace ClientIdentity;
+void Server::HandleClientIdentity(StringHash eventType, VariantMap& eventData) {
+    using namespace ClientIdentity;
     URHO3D_LOGINFO("HandleClientIdentity");
 
     // When a client connects, assign to scene to begin scene replication
-    Connection* newConnection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
-    scene_->Clear(true, false);
+    Connection *newConnection = static_cast<Connection *>(eventData[P_CONNECTION].GetPtr());
+    //newConnection->GetScene()->Clear(true, false);
     newConnection->SetScene(scene_);
 
     URHO3D_LOGINFO("HandleClientIdentity - client assigned for scene replication.");
@@ -485,9 +485,9 @@ void Server::HandleClientDisconnected(StringHash eventType, VariantMap& eventDat
 
 void Server::HandleClientObjectID(StringHash eventType, VariantMap& eventData)
 {
-    URHO3D_LOGINFOF("HandleClientObjectID: clientID = %u", clientObjectID_);
 
     clientObjectID_ = eventData[ClientObjectID::P_ID].GetUInt();
+    URHO3D_LOGINFOF("HandleClientObjectID: clientID = %u", clientObjectID_);
 
 /*
 
