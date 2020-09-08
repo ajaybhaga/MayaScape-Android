@@ -112,7 +112,7 @@ void Server::Disconnect()
 
 Node* Server::CreatePlayer(Connection* connection) {
 
-    Node *playerNode = connection->GetScene()->CreateChild("Player", REPLICATED);
+    Node *playerNode = scene_->CreateChild("Player", REPLICATED);
 
 //    ClientObj *clientObj = (ClientObj*)playerNode->CreateComponent(clientHash_);
     // Player is replaced with NetworkActor -> which is a Player
