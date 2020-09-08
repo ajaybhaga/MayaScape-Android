@@ -98,7 +98,7 @@ void Server::Disconnect()
     if (serverConnection)
     {
         serverConnection->Disconnect();
-        scene_->Clear(true, false);
+        //scene_->Clear(true, false);
         clientObjectID_ = 0;
         loginList_.Clear();
     }
@@ -106,7 +106,7 @@ void Server::Disconnect()
     else if (network->IsServerRunning())
     {
         network->StopServer();
-        scene_->Clear(true, false);
+        //scene_->Clear(true, false);
     }
 }
 
