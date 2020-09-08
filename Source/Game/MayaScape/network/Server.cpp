@@ -112,7 +112,7 @@ void Server::Disconnect()
 
 Node* Server::CreatePlayer(Connection* connection) {
 
-    Node *playerNode = scene_->CreateChild("Player", REPLICATED);
+    Node *playerNode = connection->GetScene()->CreateChild("Player", REPLICATED);
 
 //    ClientObj *clientObj = (ClientObj*)playerNode->CreateComponent(clientHash_);
     // Player is replaced with NetworkActor -> which is a Player
@@ -315,6 +315,8 @@ void Server::HandleClientIdentity(StringHash eventType, VariantMap& eventData)
     URHO3D_LOGINFO("HandleClientIdentity - client assigned for scene replication.");
     URHO3D_LOGINFOF("Server: Scene checksum -> %s", ToStringHex(scene_->GetChecksum()).CString());
 
+    // Transmit scene from server to client
+    newConnection->SetScene(scene_);
 
     // Then create a controllable object for that client
     //Node* clientObject = CreateClientObject(newConnection);
@@ -325,7 +327,6 @@ void Server::HandleClientIdentity(StringHash eventType, VariantMap& eventData)
 
     URHO3D_LOGINFOF("Server: Client players -> %d", serverObjects_.Size());
 
-    newConnection->SetScene(scene_);
 
     // Output the updated login list
     OutputLoginListToConsole();
@@ -459,7 +460,7 @@ void Server::DestroyPlayer(Connection* connection) {
     serverObjects_.Erase(connection);
     actorMap_.Erase(connection);
 
-    scene_->Clear(true, false);
+//    scene_->Clear(true, false);
 
     // Remove raycast vehicle -> to prevent bullet physics crash
 }

@@ -596,10 +596,6 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
     }
 
     unsigned nodeIDx = msg.ReadNetID();
-    if (nodeIDx == 4) {
-        URHO3D_LOGWARNING("BAD NODE 4!!!");
-    }
-
     URHO3D_LOGINFOF("PROCESS SCENE UPDATE: %u", nodeIDx);
 
     if (!scene_)
