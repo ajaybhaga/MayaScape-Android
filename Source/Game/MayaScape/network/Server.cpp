@@ -460,9 +460,8 @@ void Server::DestroyPlayer(Connection* connection) {
     serverObjects_.Erase(connection);
     actorMap_.Erase(connection);
 
-//    scene_->Clear(true, false);
-
-    // Remove raycast vehicle -> to prevent bullet physics crash
+    // Clear removed replicated nodes
+    scene_->Clear(true, false);
 }
 
 void Server::HandleClientDisconnected(StringHash eventType, VariantMap& eventData)
