@@ -318,14 +318,12 @@ void Server::HandleClientIdentity(StringHash eventType, VariantMap& eventData)
     // Transmit scene from server to client
     newConnection->SetScene(scene_);
 
-    // Then create a controllable object for that client
-    //Node* clientObject = CreateClientObject(newConnection);
-
     // Create player for new client (NetworkActor is child of ClientObj)
     Node* clientObject = CreatePlayer(newConnection);
     serverObjects_[newConnection] = clientObject;
 
     URHO3D_LOGINFOF("Server: Client players -> %d", serverObjects_.Size());
+    URHO3D_LOGINFOF("Server: scene replicated components -> %d", scene_->GetNumNetworkComponents());
 
 
     // Output the updated login list
@@ -432,7 +430,7 @@ void Server::DestroyPlayer(Connection* connection) {
     if (object)
     {
         URHO3D_LOGINFOF("**** DESTROYING CLIENT OBJECT -> %d", object->GetID());
-        object->RemoveAllChildren();
+//        object->RemoveAllChildren();
         object->Remove();
     }
 /*
