@@ -1379,6 +1379,8 @@ void MayaScape::HandleClientSceneLoaded(StringHash eventType, VariantMap& eventD
     // Clear existing replicated nodes on client
   //  scene_->Clear(true,false);
 
+  scene_->MarkNetworkUpdate();
+
 
 }
 
@@ -3353,6 +3355,7 @@ void MayaScape::HandleClientObjectID(StringHash eventType, VariantMap &eventData
 
     URHO3D_LOGINFOF("Client -> scene checksum: %d", ToStringHex(scene_->GetChecksum()).CString());
 
+    /*
     auto *network = GetSubsystem<Network>();
     Connection *serverConnection = network->GetServerConnection();
 
@@ -3366,7 +3369,7 @@ void MayaScape::HandleClientObjectID(StringHash eventType, VariantMap &eventData
         textEdit_->SetText(String::EMPTY);
 
         URHO3D_LOGINFOF("Client -> sent node error message: %s", msg.GetData());
-    }
+    }*/
 }
 
 
