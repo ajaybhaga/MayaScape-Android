@@ -98,7 +98,7 @@ void Server::Disconnect()
     if (serverConnection)
     {
         serverConnection->Disconnect();
-        //scene_->Clear(true, false);
+        scene_->Clear(true, false);
         clientObjectID_ = 0;
         loginList_.Clear();
     }
@@ -106,7 +106,7 @@ void Server::Disconnect()
     else if (network->IsServerRunning())
     {
         network->StopServer();
-        //scene_->Clear(true, false);
+        scene_->Clear(true, false);
     }
 }
 
@@ -139,6 +139,14 @@ Node* Server::CreatePlayer(Connection* connection) {
     // set identity
     if (connection)
     {
+
+        // When a client connects, assign to scene to begin scene replication
+        //Connection* newConnection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
+
+        // Transmit scene from server to client
+       // connection->SetScene(scene_);
+
+
         String name = connection->identity_["UserName"].GetString();
         int colorIdx = connection->identity_["ColorIdx"].GetInt();
         actorClientObj_->SetClientInfo(name, colorIdx);
@@ -265,6 +273,7 @@ void Server::UpdatePhysicsPreStep(const Controls &controls)
                 clientObj->SetControls(controls);
                 // Apply control to actor
                 actorMap_[connection]->SetControls(controls);
+                clientObj->MarkNetworkUpdate();
             }
         }
     }
@@ -311,12 +320,11 @@ void Server::HandleClientIdentity(StringHash eventType, VariantMap& eventData)
 
     // When a client connects, assign to scene to begin scene replication
     Connection* newConnection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
+    // Transmit scene from server to client
+    newConnection->SetScene(scene_);
 
     URHO3D_LOGINFO("HandleClientIdentity - client assigned for scene replication.");
     URHO3D_LOGINFOF("Server: Scene checksum -> %s", ToStringHex(scene_->GetChecksum()).CString());
-
-    // Transmit scene from server to client
-    newConnection->SetScene(scene_);
 
     // Create player for new client (NetworkActor is child of ClientObj)
     Node* clientObject = CreatePlayer(newConnection);
@@ -360,17 +368,18 @@ void Server::HandleNetworkUpdateSent(StringHash eventType, VariantMap& eventData
         if (clientObjectID_)
         {
 
-            Node *clientNode = serverConnection->GetScene()->GetNode(clientObjectID_);
+            Node *clientNode = scene_->GetNode(clientObjectID_);
 
             if (clientNode)
             {
+
+                //serverConnection->SetScene(scene_);
 
                 NetworkActor *networkActor = clientNode->GetDerivedComponent<NetworkActor>();
 
                 if (networkActor)
                 {
                     networkActor->ClearControls();
-                 //   serverConnection->GetScene()->Clear(true, false);
                 }
             }
         }
