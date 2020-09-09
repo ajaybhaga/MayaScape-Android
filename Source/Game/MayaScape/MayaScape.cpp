@@ -197,6 +197,9 @@ MayaScape::MayaScape(Context *context) :
     Bullet::RegisterObject(context);
     AP::RegisterObject(context);
     Player::RegisterObject(context);
+    // register client objs
+    ClientObj::RegisterObject(context);
+    NetworkActor::RegisterObject(context);
 
     CSP_Server::RegisterObject(context);
     CSP_Client::RegisterObject(context);
@@ -2471,10 +2474,6 @@ void MayaScape::HandlePlayButton(StringHash eventType, VariantMap &eventData) {
 // Network functions
 void MayaScape::CreateServerSubsystem() {
     context_->RegisterSubsystem(new Server(context_));
-
-    // register client objs
-    ClientObj::RegisterObject(context_);
-    NetworkActor::RegisterObject(context_);
 }
 
 void MayaScape::CreateAdminPlayer() {

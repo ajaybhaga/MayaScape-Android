@@ -209,10 +209,10 @@ void Server::UpdateActors(float timeStep) {
                    //     actor->GetNode()->SetPosition(actor->vehicle_->GetNode()->GetPosition());
 
                     // TODO: Add delay for player state?
-                    SendPlayerStateMsg(connection);
+//                    SendPlayerStateMsg(connection);
 
                     // Mark actor to update on network for replicate nodes
-                    actor->MarkNetworkUpdate();
+        //            actor->MarkNetworkUpdate();
 
             }
         }
@@ -371,13 +371,14 @@ void Server::HandleNetworkUpdateSent(StringHash eventType, VariantMap& eventData
                 // Cannot retrieve replicated nodes on client
                 if (clientNode) {
 
+                    /*
                     if (first) {
                         File saveFile(context_,
                                       GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/MayaScape_FIRST.xml",
                                       FILE_WRITE);
                         scene_->SaveXML(saveFile);
                         first = false;
-                    }
+                    }*/
 
 //                serverConnection->GetScene()->MarkNetworkUpdate();
 
