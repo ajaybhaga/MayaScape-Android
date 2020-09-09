@@ -347,6 +347,7 @@ void Server::HandleClientSceneLoaded(StringHash eventType, VariantMap& eventData
 
 }
 
+bool first = true;
 void Server::HandleNetworkUpdateSent(StringHash eventType, VariantMap& eventData)
 {
 //    URHO3D_LOGINFO("HandleNetworkUpdateSent");
@@ -364,11 +365,19 @@ void Server::HandleNetworkUpdateSent(StringHash eventType, VariantMap& eventData
             // CLIENT CODE
             if (clientObjectID_) {
 
-                Node *clientNode = serverConnection->GetScene()->GetChild(clientObjectID_);
+                Node *clientNode = scene_->GetChild(clientObjectID_);
 
                 // TODO: Issue
                 // Cannot retrieve replicated nodes on client
                 if (clientNode) {
+
+                    if (first) {
+                        File saveFile(context_,
+                                      GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/MayaScape_FIRST.xml",
+                                      FILE_WRITE);
+                        scene_->SaveXML(saveFile);
+                        first = false;
+                    }
 
 //                serverConnection->GetScene()->MarkNetworkUpdate();
 
@@ -470,7 +479,7 @@ void Server::DestroyPlayer(Connection* connection) {
     actorMap_.Erase(connection);
 
     // Clear removed replicated nodes
-    scene_->Clear(true, false);
+    //scene_->Clear(true, false);
 //    scene_->MarkReplicationDirty(scene_);
 }
 
