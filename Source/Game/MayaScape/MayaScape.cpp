@@ -3337,6 +3337,7 @@ void MayaScape::HandleConnectionStatus(StringHash eventType, VariantMap &eventDa
     }
 
     UpdateButtons();
+
 }
 
 void MayaScape::HandleClientObjectID(StringHash eventType, VariantMap &eventData) {

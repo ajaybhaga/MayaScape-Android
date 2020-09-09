@@ -4,7 +4,7 @@
 	<attribute name="Time Scale" value="1" />
 	<attribute name="Smoothing Constant" value="50" />
 	<attribute name="Snap Threshold" value="5" />
-	<attribute name="Elapsed Time" value="8.22884" />
+	<attribute name="Elapsed Time" value="41.5656" />
 	<attribute name="Next Replicated Node ID" value="1" />
 	<attribute name="Next Replicated Component ID" value="1" />
 	<attribute name="Next Local Node ID" value="16777507" />
@@ -607,7 +607,7 @@
 			<attribute name="Bottom Right Color" value="0 1 0 1" />
 		</component>
 	</node>
-	<node id="3">
+	<node id="9">
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="" />
 		<attribute name="Tags" />
@@ -617,28 +617,28 @@
 		<attribute name="Variables" />
 		<component type="SmoothedTransform" id="16777529" />
 	</node>
-	<node id="5255683">
+	<node id="5255689">
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="" />
 		<attribute name="Tags" />
 		<attribute name="Position" value="0 0 0" />
-		<attribute name="Rotation" value="0.0068782 -0.163086 -0.921981 -0.35115" />
+		<attribute name="Rotation" value="0.00560684 -0.596342 -0.74994 -0.286244" />
 		<attribute name="Scale" value="1 1 1" />
 		<attribute name="Variables">
-			<variant hash="1051970044" type="None" value="" />
+			<variant hash="1049792147" type="None" value="" />
 			<variant hash="0" type="None" value="" />
 		</attribute>
 		<component type="SmoothedTransform" id="16777530" />
 	</node>
-	<node id="5650947">
+	<node id="5650953">
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="" />
 		<attribute name="Tags" />
 		<attribute name="Position" value="0 0 0" />
-		<attribute name="Rotation" value="-0.761575 0.465562 -0.0785282 -0.443947" />
+		<attribute name="Rotation" value="-0.720564 0.440491 -0.333289 -0.419133" />
 		<attribute name="Scale" value="6.97695e+22 -1.5882e-23 -1.58821e-23" />
 		<attribute name="Variables">
-			<variant hash="1055083782" type="None" value="" />
+			<variant hash="1054251175" type="None" value="" />
 			<variant hash="0" type="None" value="" />
 		</attribute>
 		<component type="SmoothedTransform" id="16777531" />

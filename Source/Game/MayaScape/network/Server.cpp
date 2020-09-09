@@ -364,22 +364,28 @@ void Server::HandleNetworkUpdateSent(StringHash eventType, VariantMap& eventData
     // Client: collect controls
     if (serverConnection)
     {
-        // CLIENT CODE
-        if (clientObjectID_)
-        {
 
-            Node *clientNode = scene_->GetNode(clientObjectID_);
+        // On connected client
+        if (serverConnection->IsConnected()) {
 
-            if (clientNode)
-            {
+            // CLIENT CODE
+            if (clientObjectID_) {
 
-                //serverConnection->SetScene(scene_);
+                Node *clientNode = serverConnection->GetScene()->GetChild(clientObjectID_);
 
-                NetworkActor *networkActor = clientNode->GetDerivedComponent<NetworkActor>();
+                // TODO: Issue
+                // Cannot retrieve replicated nodes on client
+                if (clientNode) {
 
-                if (networkActor)
-                {
-                    networkActor->ClearControls();
+//                serverConnection->GetScene()->MarkNetworkUpdate();
+
+                    //serverConnection->SetScene(scene_);
+
+                    NetworkActor *networkActor = clientNode->GetDerivedComponent<NetworkActor>();
+
+                    if (networkActor) {
+                        networkActor->ClearControls();
+                    }
                 }
             }
         }
