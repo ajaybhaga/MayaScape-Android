@@ -140,13 +140,6 @@ Node* Server::CreatePlayer(Connection* connection) {
     if (connection)
     {
 
-        // When a client connects, assign to scene to begin scene replication
-        //Connection* newConnection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
-
-        // Transmit scene from server to client
-       // connection->SetScene(scene_);
-
-
         String name = connection->identity_["UserName"].GetString();
         int colorIdx = connection->identity_["ColorIdx"].GetInt();
         actorClientObj_->SetClientInfo(name, colorIdx);
@@ -273,7 +266,7 @@ void Server::UpdatePhysicsPreStep(const Controls &controls)
                 clientObj->SetControls(controls);
                 // Apply control to actor
                 actorMap_[connection]->SetControls(controls);
-                clientObj->MarkNetworkUpdate();
+                //clientObj->MarkNetworkUpdate();
             }
         }
     }
@@ -381,7 +374,7 @@ void Server::HandleNetworkUpdateSent(StringHash eventType, VariantMap& eventData
 
                     //serverConnection->SetScene(scene_);
 
-                    NetworkActor *networkActor = clientNode->GetDerivedComponent<NetworkActor>();
+                    NetworkActor *networkActor = clientNode->GetDerivedComponent<NetworkActor>(true);
 
                     if (networkActor) {
                         networkActor->ClearControls();

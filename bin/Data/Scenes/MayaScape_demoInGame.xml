@@ -4,11 +4,11 @@
 	<attribute name="Time Scale" value="1" />
 	<attribute name="Smoothing Constant" value="50" />
 	<attribute name="Snap Threshold" value="5" />
-	<attribute name="Elapsed Time" value="41.5656" />
+	<attribute name="Elapsed Time" value="53.4173" />
 	<attribute name="Next Replicated Node ID" value="1" />
 	<attribute name="Next Replicated Component ID" value="1" />
-	<attribute name="Next Local Node ID" value="16777507" />
-	<attribute name="Next Local Component ID" value="16777532" />
+	<attribute name="Next Local Node ID" value="16778019" />
+	<attribute name="Next Local Component ID" value="16778044" />
 	<attribute name="Variables" />
 	<attribute name="Variable Names" value="" />
 	<component type="Octree" id="16777216" />
@@ -319,7 +319,7 @@
 				<attribute name="Cast Shadows" value="true" />
 			</component>
 			<component type="RigidBody" id="16777501">
-				<attribute name="Physics Rotation" value="0.707043 -0.00946764 -0.00946764 -0.707043" />
+				<attribute name="Physics Rotation" value="0.707043 -0.00946766 -0.00946766 -0.707043" />
 				<attribute name="Physics Position" value="-446.341 2.29922 -481.463" />
 				<attribute name="Collision Layer" value="2" />
 			</component>
@@ -606,41 +606,5 @@
 			<attribute name="Bottom Left Color" value="0 1 0 1" />
 			<attribute name="Bottom Right Color" value="0 1 0 1" />
 		</component>
-	</node>
-	<node id="9">
-		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="" />
-		<attribute name="Tags" />
-		<attribute name="Position" value="0 0 0" />
-		<attribute name="Rotation" value="1 0 0 0" />
-		<attribute name="Scale" value="1 1 1" />
-		<attribute name="Variables" />
-		<component type="SmoothedTransform" id="16777529" />
-	</node>
-	<node id="5255689">
-		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="" />
-		<attribute name="Tags" />
-		<attribute name="Position" value="0 0 0" />
-		<attribute name="Rotation" value="0.00560684 -0.596342 -0.74994 -0.286244" />
-		<attribute name="Scale" value="1 1 1" />
-		<attribute name="Variables">
-			<variant hash="1049792147" type="None" value="" />
-			<variant hash="0" type="None" value="" />
-		</attribute>
-		<component type="SmoothedTransform" id="16777530" />
-	</node>
-	<node id="5650953">
-		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="" />
-		<attribute name="Tags" />
-		<attribute name="Position" value="0 0 0" />
-		<attribute name="Rotation" value="-0.720564 0.440491 -0.333289 -0.419133" />
-		<attribute name="Scale" value="6.97695e+22 -1.5882e-23 -1.58821e-23" />
-		<attribute name="Variables">
-			<variant hash="1054251175" type="None" value="" />
-			<variant hash="0" type="None" value="" />
-		</attribute>
-		<component type="SmoothedTransform" id="16777531" />
 	</node>
 </scene>

@@ -3270,7 +3270,8 @@ void MayaScape::HandleConnect(StringHash eventType, VariantMap &eventData) {
 
 //         server-
 
-    //    scene_->Clear(true, false);
+//        scene_->Clear(true, false);
+ //       scene_->SetScene()
 
 
     } else {
@@ -3498,6 +3499,8 @@ void MayaScape::HandleNetworkMessage(StringHash /*eventType*/, VariantMap &event
         //    scene_->MarkReplicationDirty(scene_);
         ///    scene_->MarkNetworkUpdate();
     }
+
+    scene_->MarkNetworkUpdate();
 
 
     if (msgID == MSG_CHAT) {
