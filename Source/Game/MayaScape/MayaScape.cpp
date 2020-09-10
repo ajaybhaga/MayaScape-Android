@@ -455,8 +455,7 @@ void MayaScape::CreateAgents() {
         agents_[i]->SetWaypoints((&waypointsWorld_));
 
         // Place on track
-        agents_[i]->GetNode()->SetPosition(
-                Vector3(-814.0f + Random(-400.f, 400.0f), 400.0f, -595.0f + Random(-400.f, 400.0f)));
+//        agents_[i]->GetNode()->SetPosition(Vector3(-814.0f + Random(-400.f, 400.0f), 400.0f, -595.0f + Random(-400.f, 400.0f)));
 
         // Store initial player position as focus
 //        focusObjects_.Push(player_->GetNode()->GetPosition());
@@ -465,7 +464,7 @@ void MayaScape::CreateAgents() {
 //        TerrainPatch* p = terrain_->GetPatch(0, 0);
         //       IntVector2 v = p->GetCoordinates();
 
-        agents_[i]->GetNode()->SetRotation(Quaternion(0.0, -90.0, 0.0));
+        //agents_[i]->GetNode()->SetRotation(Quaternion(0.0, -90.0, 0.0));
 
 
         // Create the vehicle logic component
@@ -2222,40 +2221,9 @@ void MayaScape::HandleUpdate(StringHash eventType, VariantMap &eventData) {
 
     // Call our render update
     HandleRenderUpdate(eventType, eventData);
-
-//    if (gameState_ == IN_GAME) {
-        auto serverConnection = GetSubsystem<Network>()->GetServerConnection();
-        if (serverConnection) {
-
-            // On client set camera
-
-            if (peers_[serverConnection] && peers_[serverConnection]->GetNode()) {
-                const float CAMERA_DISTANCE = 4.0f;
-
-                // Move camera some distance away from the ball
-                cameraNode_->SetPosition(peers_[serverConnection]->GetNode()->GetPosition() + cameraNode_->GetRotation() * Vector3::BACK * CAMERA_DISTANCE);
-            } else {
-
-            // On server update client objects (server world)
-
-                UpdateClientObjects();
-            }
-        }
-  //  }
-
 }
 
 void MayaScape::HandlePostUpdate(StringHash eventType, VariantMap &eventData) {
-//    if (!player_)
-//        return;
-
-    //  Node *character2DNode = player_->GetNode();
-    /* cameraNode_->SetPosition(Vector3(character2DNode->GetPosition().x_, character2DNode->GetPosition().y_,
-                                      -10.0f)); // Camera tracks character
- */
-
-//  GetSubsystem<Network>()->GetServerConnection()->GetScene()->Clear(true, false);
-
 
     if (packetCounterTimer_.GetMSec(false) > 1000 && GetSubsystem<Network>()->GetServerConnection()) {
         packetsIn_->SetText(
@@ -2276,39 +2244,6 @@ void MayaScape::HandlePostUpdate(StringHash eventType, VariantMap &eventData) {
         packetsOut_->SetText("Packets out: " + String(packetsOut));
         packetCounterTimer_.Reset();
     }
-
-
-//    targetCameraPos_ = Vector3(0.0f, 60.0f, CAMERA_DISTANCE);
-//    cameraNode_->SetPosition(targetCameraPos_);
-//    cameraNode_->SetRotation(Quaternion(30.0, 0.0, 0.0));
-
-/*
-    //
-    if (!player_->vehicle_)
-    {
-        return;
-    }
-    Node* vehicleNode = player_->vehicle_->GetNode();
-    // Physics update has completed. Position camera behind vehicle
-    Quaternion dir(vehicleNode->GetRotation().YawAngle(), Vector3::UP);
-    dir = dir * Quaternion(player_->vehicle_->controls_.yaw_, Vector3::UP);
-    dir = dir * Quaternion(player_->vehicle_->controls_.pitch_, Vector3::RIGHT);
-    Vector3 cameraTargetPos =
-            vehicleNode->GetPosition() - dir * Vector3(0.0f, -4.0f, CAMERA_DISTANCE);
-    Vector3 cameraStartPos = vehicleNode->GetPosition();
-    // Raycast camera against static objects (physics collision mask 2)
-    // and move it closer to the vehicle if something in between
-    Ray cameraRay(cameraStartPos, cameraTargetPos - cameraStartPos);
-    float cameraRayLength = (cameraTargetPos - cameraStartPos).Length();
-    PhysicsRaycastResult result;
-    scene_->GetComponent<PhysicsWorld>()->RaycastSingle(result, cameraRay, cameraRayLength, 2);
-    if (result.body_)
-    {
-        cameraTargetPos = cameraStartPos + cameraRay.direction_ * (result.distance_ - 0.5f);
-    }
-    cameraNode_->SetPosition(cameraTargetPos);
-    cameraNode_->SetRotation(dir);*/
-
 
     if (started_) {
         Node *actorNode = nullptr;
@@ -2364,34 +2299,10 @@ void MayaScape::HandlePostUpdate(StringHash eventType, VariantMap &eventData) {
 }
 
 void MayaScape::HandlePostRenderUpdate(StringHash eventType, VariantMap &eventData) {
-    // Mesh and bones do not match -> bones are too big
-    // Scale down bone
-//    player_->
+
     if (player_) {
-//        auto *model_ = player_->GetNode()->GetComponent<AnimatedModel>(true);
-        //node_->GetComponent<AnimatedModel>(true);
-
-
-        //  if (!model_ || !animation_)
-        //      return;
-/*
-        Skeleton &skeleton = model_->GetSkeleton();
-        Bone *rootBone = skeleton.GetRootBone();
-        Bone *startBone = rootBone;
-
-        if (!rootBone)
-            return;*/
-
-//    startBone->initialScale_(Vector3(0.01f, 0.01f, 0.01f));
 
         if (drawDebug_) {
-/*        auto *physicsWorld = scene_->GetComponent<PhysicsWorld2D>();
-        physicsWorld->DrawDebugGeometry();
-
-        Node *tileMapNode = scene_->GetChild("TileMap", true);
-        auto *map = tileMapNode->GetComponent<TileMap3D>();
-        map->DrawDebugGeometry(scene_->GetComponent<DebugRenderer>(), false);
-*/
             // bones. Note that debug geometry has to be separately requested each frame. Disable depth test so that we can see the
             // bones properly
             GetSubsystem<Renderer>()->DrawDebugGeometry(false);
