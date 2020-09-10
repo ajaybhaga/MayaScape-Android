@@ -2246,27 +2246,24 @@ void MayaScape::HandlePostUpdate(StringHash eventType, VariantMap &eventData) {
     }
 
     if (started_) {
-        Node *actorNode = nullptr;
 
-        actorNode = scene_->GetNode(playerObjectID_);
+        if (isServer_) {
+            // SERVER
+            // Set server cam to aerial
+            SetAerialCamera();
+        } else {
+            // CLIENT
 
-        using namespace Update;
-        float timeStep = eventData[P_TIMESTEP].GetFloat();
+            Node *actorNode = nullptr;
+            actorNode = scene_->GetNode(playerObjectID_);
 
-        if (actorNode) {
-            // Update player node
-            player_ = static_cast<SharedPtr<Node>>(actorNode);
+            using namespace Update;
+            float timeStep = eventData[P_TIMESTEP].GetFloat();
 
+            if (actorNode) {
+                // Update player node
+                player_ = static_cast<SharedPtr<Node>>(actorNode);
 
-            if (isServer_) {
-
-                // SERVER
-                // Set server cam to aerial
-                SetAerialCamera();
-
-            } else {
-
-                // CLIENT
                 // Apply transformations to camera
                 MoveCamera(actorNode, timeStep);
 
@@ -2277,18 +2274,6 @@ void MayaScape::HandlePostUpdate(StringHash eventType, VariantMap &eventData) {
 
             for (int i = 0; i < hudTextList_.Size(); i++) {
                 hudTextList_[i]->SetVisible(true);
-            }
-
-        } else {
-            // For server
-            if (isServer_) {
-
-                // Default to aerial camera (server top-view)
-                // Apply transformations to camera
-                MoveCamera(actorNode, timeStep);
-            } else {
-                // For client, could not get controllable network actor
-                // This should resolve in a a few cycles
             }
         }
     }
