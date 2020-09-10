@@ -114,17 +114,13 @@ Node* Server::CreatePlayer(Connection* connection) {
 
     Node *playerNode = scene_->CreateChild("Player", REPLICATED);
 
-//    ClientObj *clientObj = (ClientObj*)playerNode->CreateComponent(clientHash_);
     // Player is replaced with NetworkActor -> which is a Player
-    NetworkActor* actorClientObj_ = (NetworkActor*)playerNode->CreateComponent(clientHash_);
-    actorClientObj_->isServer_ = true;
-
-    // Place on track
-//    playerNode->SetPosition(Vector3(-814.0f + Random(-400.f, 400.0f), 400.0f, -595.0f + Random(-400.f, 400.0f)));
-
+   // NetworkActor* actorClientObj_ = (NetworkActor*)playerNode->CreateComponent(clientHash_);
 
     // Store the player in map
-    actorMap_.Populate(connection, static_cast<const WeakPtr<NetworkActor>>(actorClientObj_));
+    actorMap_[connection] =  new NetworkActor(context_);
+    actorMap_[connection]->SetScene(scene_);
+    actorMap_[connection]->Create(connection);
 
 //    player_->GetNode()->SetPosition(Vector3(0, 0, 0));
 
@@ -142,7 +138,7 @@ Node* Server::CreatePlayer(Connection* connection) {
 
         String name = connection->identity_["UserName"].GetString();
         int colorIdx = connection->identity_["ColorIdx"].GetInt();
-        actorClientObj_->SetClientInfo(name, colorIdx);
+        actorMap_[connection]->SetClientInfo(name, colorIdx);
 
         URHO3D_LOGINFOF("client identity name=%s", name.CString());
         URHO3D_LOGINFOF("HandleClientConnected - data: [%s, %d]", name.CString(), colorIdx);
@@ -184,6 +180,38 @@ void Server::SubscribeToEvents()
     SubscribeToEvent(E_NETWORKUPDATESENT, URHO3D_HANDLER(Server, HandleNetworkUpdateSent));
 }
 
+
+
+/*
+void MayaScape::UpdateClientObjects()
+{
+    PODVector<Node*> playerNodes;
+    scene_->GetNodesWithTag(playerNodes, "Player");
+    auto clients = GetSubsystem<Network>()->GetClientConnections();
+    for (auto it = clients.Begin(); it != clients.End(); ++it) {
+        for (auto it2 = playerNodes.Begin(); it2 != playerNodes.End(); ++it2) {
+            if ((*it2)->GetVar("GUID").GetString() == (*it)->GetGUID()) {
+                if (!peers_[(*it)]) {
+                    peers_[(*it)] = new Peer(context_);
+                    peers_[(*it)]->SetConnection((*it));
+                    peers_[(*it)]->SetScene(scene_);
+                }
+                peers_[(*it)]->SetNode((*it2));
+            }
+        }
+    }
+    for (auto it2 = playerNodes.Begin(); it2 != playerNodes.End(); ++it2) {
+        if ((*it2)->GetVar("GUID").GetString() == GetSubsystem<Network>()->GetGUID()) {
+            if (!peers_[GetSubsystem<Network>()->GetServerConnection()]) {
+                peers_[GetSubsystem<Network>()->GetServerConnection()] = new Peer(context_);
+                peers_[GetSubsystem<Network>()->GetServerConnection()]->SetConnection(GetSubsystem<Network>()->GetServerConnection());
+                peers_[GetSubsystem<Network>()->GetServerConnection()]->SetScene(scene_);
+            }
+            peers_[GetSubsystem<Network>()->GetServerConnection()]->SetNode(*it2);
+        }
+    }
+}
+*/
 void Server::UpdateActors(float timeStep) {
 
     Network* network = GetSubsystem<Network>();
@@ -201,6 +229,8 @@ void Server::UpdateActors(float timeStep) {
             NetworkActor *actor = actorMap_[connection];
 
             if (actor) {
+                    actor->SetConnection(connection);
+                    actor->SetScene(scene_);
                     // Apply update to actor
                     actor->FixedUpdate(timeStep);
 

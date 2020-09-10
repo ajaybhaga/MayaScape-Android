@@ -32,6 +32,7 @@
 #include <Urho3D/UI/Text3D.h>
 #include <Urho3D/UI/Font.h>
 #include <Urho3D/IO/Log.h>
+#include <Urho3D/Network/Connection.h>
 #include <Urho3D/Physics/PhysicsUtils.h>
 #include <Urho3D/Math/MathDefs.h>
 #include <Urho3D/Graphics/DebugRenderer.h>
@@ -46,8 +47,7 @@
 //=============================================================================
 //=============================================================================
 NetworkActor::NetworkActor(Context *context)
-        : ClientObj(context), mass_(10.0f),
-          isServer_(false) {
+        : ClientObj(context), mass_(10.0f) {
     //  SetUpdateEventMask(0);
     // fixed update() for inputs and post update() to sync wheels for rendering
 //    SetUpdateEventMask( USE_FIXEDUPDATE | USE_FIXEDPOSTUPDATE| USE_POSTUPDATE );
@@ -66,7 +66,6 @@ NetworkActor::NetworkActor(Context *context)
     lastFire_ = 0;
     targetAgentIndex_ = 0;
 //    bulletType_ = "AP";
-    created_ = false;
 
 }
 
@@ -85,7 +84,6 @@ NetworkActor::~NetworkActor() {
         node_->Remove();
     }
 
-    created_ = false;
 }
 
 void NetworkActor::RegisterObject(Context *context) {
@@ -127,7 +125,6 @@ void NetworkActor::RegisterObject(Context *context) {
     SharedPtr<Vehicle> vehicle_;
     SharedPtr<Text3D> floatingText_;
 
-    bool isServer_;
     bool created_;
 
     /// Flag when player is dead.
@@ -180,54 +177,6 @@ void NetworkActor::RegisterObject(Context *context) {
 void NetworkActor::ApplyAttributes() {
 }
 
-void NetworkActor::DelayedStart() {
-    Create();
-}
-
-// This will be run by server to create server objects (running the physics world)
-void NetworkActor::Create() {
-
-    if (!created_) {
-            ResourceCache *cache = GetSubsystem<ResourceCache>();
-
-            node_ = GetNode();
-
-        // Init vehicle
-            Node *vehicleNode = GetScene()->CreateChild("Vehicle", REPLICATED);
-
-            // Default at (0,300,0) above terrain before we set location
-            float factor = 500.0f;
-
-            // Place on track
-//           vehicleNode->SetPosition(Vector3(-814.0f+Random(-400.f, 400.0f), 500.0f, -595.0f+Random(-400.f, 400.0f)));
-            vehicleNode->SetPosition(Vector3(-814.0f+Random(-400.f, 400.0f), 300.0f, -595.0f+Random(-400.f, 400.0f)));
-
-            // Create the vehicle logic component
-            vehicle_ = vehicleNode->CreateComponent<Vehicle>(REPLICATED);
-            vehicle_->Init(isServer_);
-            vehicle_->Create();
-//        GetNode()->SetPosition(vehicle_->GetNode()->GetPosition());
-
-            wpActiveIndex_ = 0;
-            targetAgentIndex_ = 0;
-
-            vehicleNode->SetRotation(Quaternion(0.0, -90.0, 0.0));
-
-
-            // create text3d client info node LOCALLY
-            Node* floatTextNode = GetNode()->CreateChild("Float Text", LOCAL);
-            floatingText_ = floatTextNode->CreateComponent<Text3D>();
-            floatingText_->SetColor(Color::GREEN);
-            floatingText_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 20);
-            floatingText_->SetFaceCameraMode(FC_ROTATE_XYZ);
-            // register
-            SetUpdateEventMask(USE_FIXEDUPDATE);
-    }
-
-    // Instance created
-    created_ = true;
-}
-
 void NetworkActor::SetScene(Scene* scene)
 {
     scene_ = scene;
@@ -242,17 +191,17 @@ void NetworkActor::Create(Connection* connection)
     // Create the scene node & visual representation. This will be a replicated object
     node_ = scene_->CreateChild();
     node_->AddTag("Player");
-    node_->SetVar("GUID", connection->GetGUID());
+//    node_->SetVar("GUID", connection->GetGUID());
     node_->SetPosition(Vector3(0, 10, 0));
     node_->SetScale(0.5f);
     auto* ballObject = node_->CreateComponent<StaticModel>();
     ballObject->SetModel(cache->GetResource<Model>("Models/Sphere.mdl"));
     ballObject->SetMaterial(cache->GetResource<Material>("Materials/StoneSmall.xml"));
 
-    auto* titleText = node_->CreateComponent<Text3D>(REPLICATED);
-    titleText->SetText(connection->GetGUID());
-    titleText->SetFaceCameraMode(FaceCameraMode::FC_LOOKAT_XYZ);
-    titleText->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.sdf"), 30);
+    floatingText_ = node_->CreateComponent<Text3D>(REPLICATED);
+//    titleText->SetText(connection->GetGUID());
+    floatingText_->SetFaceCameraMode(FaceCameraMode::FC_LOOKAT_XYZ);
+    floatingText_->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.sdf"), 30);
 
     // Create the physics components
     auto* body = node_->CreateComponent<RigidBody>();
@@ -271,6 +220,30 @@ void NetworkActor::Create(Connection* connection)
     light->SetColor(Color(0.5f + ((unsigned)Rand() & 1u) * 0.5f, 0.5f + ((unsigned)Rand() & 1u) * 0.5f, 0.5f + ((unsigned)Rand() & 1u) * 0.5f));
 
     //node_->SetScale(1.0f);
+
+    // Init vehicle
+    Node *vehicleNode = GetScene()->CreateChild("Vehicle", REPLICATED);
+    // Default at (0,300,0) above terrain before we set location
+    float factor = 500.0f;
+
+        // Place on track
+//           vehicleNode->SetPosition(Vector3(-814.0f+Random(-400.f, 400.0f), 500.0f, -595.0f+Random(-400.f, 400.0f)));
+        vehicleNode->SetPosition(Vector3(-814.0f+Random(-400.f, 400.0f), 300.0f, -595.0f+Random(-400.f, 400.0f)));
+
+        // Create the vehicle logic component
+        vehicle_ = vehicleNode->CreateComponent<Vehicle>(REPLICATED);
+        vehicle_->Init(true);
+        vehicle_->Create();
+//        GetNode()->SetPosition(vehicle_->GetNode()->GetPosition());
+
+        wpActiveIndex_ = 0;
+        targetAgentIndex_ = 0;
+
+        vehicleNode->SetRotation(Quaternion(0.0, -90.0, 0.0));
+
+
+        // register
+        SetUpdateEventMask(USE_FIXEDUPDATE);
 }
 
 void NetworkActor::SetNode(Node* node)
@@ -310,7 +283,7 @@ void NetworkActor::SetControls(Controls controls) {
 }
 
 void NetworkActor::FixedUpdate(float timeStep) {
-    if (!node_ || !created_) {
+    if (!node_) {
         return;
     }
 
@@ -320,19 +293,17 @@ void NetworkActor::FixedUpdate(float timeStep) {
     // Client will only do local scene updates
 
     // Only allow server to control objects based on received controls from clients
-    if (isServer_) {
         // SERVER CODE
 
         // Snap network actor position/rotation to vehicle
         if (vehicle_) {
-            GetNode()->SetPosition(vehicle_->GetNode()->GetPosition());
-            GetNode()->SetRotation(vehicle_->GetNode()->GetRotation());
+            node_->SetPosition(vehicle_->GetNode()->GetPosition());
+            node_->SetRotation(vehicle_->GetNode()->GetRotation());
         }
 
         /// Clients should not update the component on its own (server will handle it)
 
         // Read control data and apply to vehicle controller
-        Node *node = GetNode();
         ///Acceleration
         if (controls_.IsDown(NTWK_CTRL_FORWARD)) {
             Accelerate();
@@ -350,9 +321,9 @@ void NetworkActor::FixedUpdate(float timeStep) {
         if (controls_.IsDown(NTWK_CTRL_LEFT)) {
             //Turn left
             //towards_ = Vector3(towards_.x_*cos(turningVelocity_*timeStep) - towards_.y_*sin(turningVelocity_*timeStep), towards_.x_*sin(turningVelocity_*timeStep) + towards_.y_*cos(turningVelocity_*timeStep), 0.0f);
-            node->Rotate2D(turningVelocity_ * timeStep);
+            node_->Rotate2D(turningVelocity_ * timeStep);
             // The angle between rotation2d and x-axis
-            float angle = 90.0f + node->GetRotation2D();
+            float angle = 90.0f + node_->GetRotation2D();
             // The towards vector according to the angle
             towards_ = Vector3(cos(angle * PI / 180.0f), sin(angle * PI / 180.0f), 0.0f);
         }
@@ -360,9 +331,9 @@ void NetworkActor::FixedUpdate(float timeStep) {
         if (controls_.IsDown(NTWK_CTRL_RIGHT)) {
             //Turn right
             //towards_ = Vector3(towards_.x_*cos(turningVelocity_*timeStep) + towards_.y_*sin(turningVelocity_*timeStep), -towards_.x_*sin(turningVelocity_*timeStep) + towards_.y_*cos(turningVelocity_*timeStep), 0.0f);
-            node->Rotate2D(-turningVelocity_ * timeStep);
+            node_->Rotate2D(-turningVelocity_ * timeStep);
             // The angle between rotation2d and x-axis
-            float angle = 90.0f + node->GetRotation2D();
+            float angle = 90.0f + node_->GetRotation2D();
             // The towards vector according to the angle
             towards_ = Vector3(cos(angle * PI / 180.0f), sin(angle * PI / 180.0f), 0.0f);
         }
@@ -453,9 +424,6 @@ void NetworkActor::FixedUpdate(float timeStep) {
 
 */
         ////
-
-
-    }
 
 }
 
@@ -597,7 +565,6 @@ void NetworkActor::Fire() {
 }
 
 void NetworkActor::Fire(Vector3 target) {
-    node_ = GetNode();
     Scene *scene = GetScene();
 
 
@@ -676,7 +643,6 @@ void NetworkActor::DebugDraw(const Color &color) {
         return;
 
     DebugRenderer *dbgRenderer = GetScene()->GetComponent<DebugRenderer>();
-    node_ = GetNode();
 
 
     if (dbgRenderer) {

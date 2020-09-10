@@ -2264,9 +2264,6 @@ void MayaScape::HandlePostUpdate(StringHash eventType, VariantMap &eventData) {
                 // Set server cam to aerial
                 SetAerialCamera();
 
-                // Update client objects (server world)
-                UpdateClientObjects();
-
             } else {
 
                 // CLIENT
@@ -3001,9 +2998,6 @@ void MayaScape::HandlePhysicsPreStep(StringHash eventType, VariantMap &eventData
             using namespace Update;
             float timeStep = eventData[P_TIMESTEP].GetFloat();
             server->UpdateActors(timeStep);
-
-
-
         }
         /*
         // This function is different on the client and server. The client collects controls (WASD controls + yaw angle)
@@ -3562,31 +3556,3 @@ void MayaScape::HandleSceneUpdate(StringHash eventType, VariantMap &eventData) {
 
 }
 
-void MayaScape::UpdateClientObjects()
-{
-    PODVector<Node*> playerNodes;
-    scene_->GetNodesWithTag(playerNodes, "Player");
-    auto clients = GetSubsystem<Network>()->GetClientConnections();
-    for (auto it = clients.Begin(); it != clients.End(); ++it) {
-        for (auto it2 = playerNodes.Begin(); it2 != playerNodes.End(); ++it2) {
-            if ((*it2)->GetVar("GUID").GetString() == (*it)->GetGUID()) {
-                if (!peers_[(*it)]) {
-                    peers_[(*it)] = new Peer(context_);
-                    peers_[(*it)]->SetConnection((*it));
-                    peers_[(*it)]->SetScene(scene_);
-                }
-                peers_[(*it)]->SetNode((*it2));
-            }
-        }
-    }
-    for (auto it2 = playerNodes.Begin(); it2 != playerNodes.End(); ++it2) {
-        if ((*it2)->GetVar("GUID").GetString() == GetSubsystem<Network>()->GetGUID()) {
-            if (!peers_[GetSubsystem<Network>()->GetServerConnection()]) {
-                peers_[GetSubsystem<Network>()->GetServerConnection()] = new Peer(context_);
-                peers_[GetSubsystem<Network>()->GetServerConnection()]->SetConnection(GetSubsystem<Network>()->GetServerConnection());
-                peers_[GetSubsystem<Network>()->GetServerConnection()]->SetScene(scene_);
-            }
-            peers_[GetSubsystem<Network>()->GetServerConnection()]->SetNode(*it2);
-        }
-    }
-}

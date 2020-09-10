@@ -29,6 +29,7 @@ namespace Urho3D
 class Controls;
 class Node;
 class RigidBody;
+class Connection;
 }
 
 using namespace Urho3D;
@@ -56,8 +57,6 @@ public:
     static void RegisterObject(Context* context);
 
     virtual void ApplyAttributes();
-    virtual void DelayedStart();
-//    virtual void Create();
 
     void DebugDraw(const Color &color);
     void ComputeSteerForce();
@@ -167,10 +166,6 @@ public:
     WeakPtr<Scene> scene_;
     Timer updateTimer_;
     ///
-
-
-    bool isServer_;
-    bool created_;
 
     /// Flag when player is dead.
     bool killed_;
