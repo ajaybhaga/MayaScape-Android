@@ -218,7 +218,7 @@ void Server::UpdateClient() {
     Network* network = GetSubsystem<Network>();
 
     // Connected to running server
-    if (network->IsServerRunning()) {
+//    if (network->GetServerConnection()->IsConnected()) {
 
         // Get the object this connection is controlling
         NetworkActor *actor = actorMap_[network->GetServerConnection()];
@@ -227,7 +227,7 @@ void Server::UpdateClient() {
             actor->SetConnection(network->GetServerConnection());
             actor->SetScene(scene_);
         }
-    }
+  //  }
 }
 
 void Server::UpdateActors(float timeStep) {
