@@ -87,6 +87,7 @@ public:
 
     void UpdatePhysicsPreStep(const Controls &controls);
     void UpdateActors(float timeStep);
+    void UpdateClient();
 
     HashMap<String, Connection*> GetLoginList() { return loginList_; }
 protected:

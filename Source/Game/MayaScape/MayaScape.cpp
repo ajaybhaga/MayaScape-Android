@@ -2983,6 +2983,9 @@ void MayaScape::HandlePhysicsPreStep(StringHash eventType, VariantMap &eventData
             using namespace Update;
             float timeStep = eventData[P_TIMESTEP].GetFloat();
             server->UpdateActors(timeStep);
+        } else {
+            // CLIENT UPDATE
+            server->UpdateClient();
         }
         /*
         // This function is different on the client and server. The client collects controls (WASD controls + yaw angle)

@@ -212,6 +212,24 @@ void MayaScape::UpdateClientObjects()
     }
 }
 */
+
+void Server::UpdateClient() {
+
+    Network* network = GetSubsystem<Network>();
+
+    // Connected to running server
+    if (network->IsServerRunning()) {
+
+        // Get the object this connection is controlling
+        NetworkActor *actor = actorMap_[network->GetServerConnection()];
+
+        if (actor) {
+            actor->SetConnection(network->GetServerConnection());
+            actor->SetScene(scene_);
+        }
+    }
+}
+
 void Server::UpdateActors(float timeStep) {
 
     Network* network = GetSubsystem<Network>();
