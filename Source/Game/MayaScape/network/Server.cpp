@@ -213,7 +213,7 @@ void MayaScape::UpdateClientObjects()
 }
 */
 
-void Server::UpdateClient() {
+void Server::UpdateClient(Connection* connection) {
 
     Network* network = GetSubsystem<Network>();
 
@@ -221,10 +221,10 @@ void Server::UpdateClient() {
 //    if (network->GetServerConnection()->IsConnected()) {
 
         // Get the object this connection is controlling
-        NetworkActor *actor = actorMap_[network->GetServerConnection()];
+        NetworkActor *actor = actorMap_[connection];
 
         if (actor) {
-            actor->SetConnection(network->GetServerConnection());
+            actor->SetConnection(connection);
             actor->SetScene(scene_);
         }
   //  }

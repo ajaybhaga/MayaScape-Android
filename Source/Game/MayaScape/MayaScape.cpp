@@ -2985,7 +2985,10 @@ void MayaScape::HandlePhysicsPreStep(StringHash eventType, VariantMap &eventData
             server->UpdateActors(timeStep);
         } else {
             // CLIENT UPDATE
-            server->UpdateClient();
+            auto network = GetSubsystem<Network>();
+            auto serverConnection = network->GetServerConnection();
+//            scene_ = serverConnection->GetScene();
+            server->UpdateClient(serverConnection);
         }
         /*
         // This function is different on the client and server. The client collects controls (WASD controls + yaw angle)
