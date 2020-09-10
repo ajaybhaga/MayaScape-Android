@@ -98,13 +98,14 @@ void NetworkActor::RegisterObject(Context *context) {
  //   URHO3D_ATTRIBUTE("Name", String, userName_, String::EMPTY, AM_DEFAULT | AM_NET);
  //   URHO3D_ATTRIBUTE("Color Index", int, colorIdx_, 0, AM_DEFAULT | AM_NET);
 
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
 
 /*
     URHO3D_ATTRIBUTE("Player Name", String, name_, 0, AM_DEFAULT | AM_NET);
-    URHO3D_ATTRIBUTE("Player Node", Variant, nodeInfo_->GetAttribute("Node"), 0, AM_DEFAULT | AM_NET | AM_LATESTDATA);
-    URHO3D_ATTRIBUTE("Vehicle", Variant, vehicle_, 0, AM_DEFAULT | AM_NET | AM_LATESTDATA);*/
+    URHO3D_ATTRIBUTE("Player Node", Variant, nodeInfo_->GetAttributeDefault(0), 0, AM_DEFAULT | AM_NET | AM_LATESTDATA);
+    //URHO3D_ATTRIBUTE("Vehicle", Variant, vehicle_, 0, AM_DEFAULT | AM_NET | AM_LATESTDATA);*/
 //    AM_LATESTDATA
-
+*/
     // update serializable of the change
 //    SetAttribute("Player Node", Variant(idx));
     // update serializable of the change
