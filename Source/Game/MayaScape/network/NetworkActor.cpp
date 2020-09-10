@@ -222,7 +222,7 @@ void NetworkActor::Create(Connection* connection)
     //node_->SetScale(1.0f);
 
     // Init vehicle
-    Node *vehicleNode = GetScene()->CreateChild("Vehicle", REPLICATED);
+    Node *vehicleNode = scene_->CreateChild("Vehicle", REPLICATED);
     // Default at (0,300,0) above terrain before we set location
     float factor = 500.0f;
 
