@@ -98,14 +98,24 @@ void NetworkActor::RegisterObject(Context *context) {
  //   URHO3D_ATTRIBUTE("Name", String, userName_, String::EMPTY, AM_DEFAULT | AM_NET);
  //   URHO3D_ATTRIBUTE("Color Index", int, colorIdx_, 0, AM_DEFAULT | AM_NET);
 
+    // These macros register the class attributes to the Context for automatic load / save handling.
+    // We specify the Default attribute mode which means it will be used both for saving into file, and network replication
+    URHO3D_ATTRIBUTE("Controls Yaw", float, controls_.yaw_, 0.0f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Controls Pitch", float, controls_.pitch_, 0.0f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Speed", float, speed_, 0.0f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Turning Velocity", float, turningVelocity_, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
 
+    //    URHO3D_ATTRIBUTE("On Ground", bool, vehicle_->GetRaycastVehicle()->GetCurrentSpeedKmHour(), 0.0f, AM_DEFAULT);
+
+    //    URHO3D_ATTRIBUTE("On Ground", bool, onGround_, false, AM_DEFAULT);
+//    URHO3D_ATTRIBUTE("OK To Jump", bool, okToJump_, true, AM_DEFAULT);
+//    URHO3D_ATTRIBUTE("In Air Timer", float, inAirTimer_, 0.0f, AM_DEFAULT);
 /*
     URHO3D_ATTRIBUTE("Player Name", String, name_, 0, AM_DEFAULT | AM_NET);
     URHO3D_ATTRIBUTE("Player Node", Variant, nodeInfo_->GetAttributeDefault(0), 0, AM_DEFAULT | AM_NET | AM_LATESTDATA);
     //URHO3D_ATTRIBUTE("Vehicle", Variant, vehicle_, 0, AM_DEFAULT | AM_NET | AM_LATESTDATA);*/
 //    AM_LATESTDATA
-*/
     // update serializable of the change
 //    SetAttribute("Player Node", Variant(idx));
     // update serializable of the change
