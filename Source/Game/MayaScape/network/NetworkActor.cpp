@@ -93,6 +93,79 @@ void NetworkActor::RegisterObject(Context *context) {
     context->RegisterFactory<NetworkActor>();
 
     URHO3D_COPY_BASE_ATTRIBUTES(ClientObj);
+
+    // Network Actor Network Attributes
+ //   URHO3D_ATTRIBUTE("Name", String, userName_, String::EMPTY, AM_DEFAULT | AM_NET);
+ //   URHO3D_ATTRIBUTE("Color Index", int, colorIdx_, 0, AM_DEFAULT | AM_NET);
+
+
+/*
+    URHO3D_ATTRIBUTE("Player Name", String, name_, 0, AM_DEFAULT | AM_NET);
+    URHO3D_ATTRIBUTE("Player Node", Variant, nodeInfo_->GetAttribute("Node"), 0, AM_DEFAULT | AM_NET | AM_LATESTDATA);
+    URHO3D_ATTRIBUTE("Vehicle", Variant, vehicle_, 0, AM_DEFAULT | AM_NET | AM_LATESTDATA);*/
+//    AM_LATESTDATA
+
+    // update serializable of the change
+//    SetAttribute("Player Node", Variant(idx));
+    // update serializable of the change
+ //   SetAttribute("Vehicle", Variant(vehicle_));
+    /*
+    String name_;
+    WeakPtr<Node> nodeInfo_;
+    Controls prevControls_;
+
+    /// The controllable vehicle component.
+    SharedPtr<Vehicle> vehicle_;
+    SharedPtr<Text3D> floatingText_;
+
+    bool isServer_;
+    bool created_;
+
+    /// Flag when player is dead.
+    bool killed_;
+    bool isAI_;
+    int agentIndex;
+    int id_;
+    int type_;
+    unsigned int wpActiveIndex_;
+    int targetAgentIndex_;
+
+
+    /// Bullets
+    String bulletType_;
+    Vector<Vector3>* waypoints_ = nullptr;
+    Vector3 toTarget_ = Vector3::ZERO;
+
+
+    //    btCollisionShape                    *sphShape_;
+
+    /// parameter
+
+    float mass_;
+    float speed_;
+    float maxSpeed_;
+    float damping_;
+    float acceleration_;
+    float brake_;
+    Vector3 towards_;
+    Vector2 towards2d_;
+    float turningVelocity_;
+    float lastFire_;
+    float heading_;
+    bool isReady_;
+    int life_;
+    int score_;
+    int health_;
+
+    Vector3 force_;
+    Vector3 offset_;
+
+    float changeTargetTime_;
+    bool autoSteering_;
+
+    bool doJump_;
+    */
+
 }
 
 void NetworkActor::ApplyAttributes() {
@@ -129,9 +202,11 @@ void NetworkActor::Create() {
 
             vehicleNode->SetRotation(Quaternion(0.0, -90.0, 0.0));
 
+            nodeInfo_ = GetNode();
+
             // create text3d client info node LOCALLY
-            nodeInfo_ = GetNode()->CreateChild("Float Text", LOCAL);
-            floatingText_ = nodeInfo_->CreateComponent<Text3D>();
+            Node* floatTextNode = GetNode()->CreateChild("Float Text", LOCAL);
+            floatingText_ = floatTextNode->CreateComponent<Text3D>();
             floatingText_->SetColor(Color::GREEN);
             floatingText_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 20);
             floatingText_->SetFaceCameraMode(FC_ROTATE_XYZ);
