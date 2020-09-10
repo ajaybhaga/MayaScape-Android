@@ -2223,6 +2223,26 @@ void MayaScape::HandleUpdate(StringHash eventType, VariantMap &eventData) {
     // Call our render update
     HandleRenderUpdate(eventType, eventData);
 
+//    if (gameState_ == IN_GAME) {
+        auto serverConnection = GetSubsystem<Network>()->GetServerConnection();
+        if (serverConnection) {
+
+            // On client set camera
+
+            if (peers_[serverConnection] && peers_[serverConnection]->GetNode()) {
+                const float CAMERA_DISTANCE = 4.0f;
+
+                // Move camera some distance away from the ball
+                cameraNode_->SetPosition(peers_[serverConnection]->GetNode()->GetPosition() + cameraNode_->GetRotation() * Vector3::BACK * CAMERA_DISTANCE);
+            } else {
+
+            // On server update client objects (server world)
+
+                UpdateClientObjects();
+            }
+        }
+  //  }
+
 }
 
 void MayaScape::HandlePostUpdate(StringHash eventType, VariantMap &eventData) {
@@ -2302,8 +2322,24 @@ void MayaScape::HandlePostUpdate(StringHash eventType, VariantMap &eventData) {
             // Update player node
             player_ = static_cast<SharedPtr<Node>>(actorNode);
 
-            // Apply transformations to camera
-            MoveCamera(actorNode, timeStep);
+
+            if (isServer_) {
+
+                // SERVER
+                // Set server cam to aerial
+                SetAerialCamera();
+
+                // Update client objects (server world)
+                UpdateClientObjects();
+
+            } else {
+
+                // CLIENT
+                // Apply transformations to camera
+                MoveCamera(actorNode, timeStep);
+
+
+            }
 
             instructionsText_->SetVisible(true);
 
@@ -2314,6 +2350,8 @@ void MayaScape::HandlePostUpdate(StringHash eventType, VariantMap &eventData) {
         } else {
             // For server
             if (isServer_) {
+
+                // Default to aerial camera (server top-view)
                 // Apply transformations to camera
                 MoveCamera(actorNode, timeStep);
             } else {
@@ -2942,42 +2980,6 @@ void MayaScape::MoveCamera(Node *actorNode, float timeStep) {
                 URHO3D_LOGINFO("--- Could not find controllable object, aborting.");
             }
 
-        } else {
-            // Set server cam to aerial
-
-            SetAerialCamera();
-/*
-            Vector3 startPos = Vector3(0.0f, 0.0f, 0.0f);
-            targetCameraPos_ = startPos + Vector3(0, 30.0f, CAMERA_DISTANCE);
-            // Calculate ray based on focus object
-//                    float curDist = (focusObjects_[focusIndex_] - targetCameraPos_).Length();
-            float curDist = (actorNode->GetPosition() - targetCameraPos_).Length();
-
-            // Calculate position based on focus object
-            Vector3 targetPos = actorNode->GetPosition() - dir * Vector3(0.0f, 0.0f, curDist);
-
-            // Set camera target position
-            targetCameraPos_ = targetPos;
-
-            Vector3 cameraTargetPos = targetCameraPos_;
-            Vector3 cameraStartPos = actorNode->GetPosition();
-
-            // Raycast camera against static objects (physics collision mask 2)
-            // and move it closer to the vehicle if something in between
-            Ray cameraRay(cameraStartPos, cameraTargetPos - cameraStartPos);
-            float cameraRayLength = (cameraTargetPos - cameraStartPos).Length();
-            PhysicsRaycastResult result;
-
-            if ((!isServer_) && (started_)) {
-                if (scene_->GetComponent<PhysicsWorld>()) {
-
-                    scene_->GetComponent<PhysicsWorld>()->RaycastSingle(result, cameraRay, cameraRayLength,
-                                                                        NETWORKACTOR_COL_LAYER);yr
-                    if (result.body_)
-                        cameraTargetPos = cameraStartPos + cameraRay.direction_ * (result.distance_ - 0.5f);
-                }
-            }*/
-
         }
     }
 }
@@ -3088,6 +3090,9 @@ void MayaScape::HandlePhysicsPreStep(StringHash eventType, VariantMap &eventData
             using namespace Update;
             float timeStep = eventData[P_TIMESTEP].GetFloat();
             server->UpdateActors(timeStep);
+
+
+
         }
         /*
         // This function is different on the client and server. The client collects controls (WASD controls + yaw angle)
@@ -3644,4 +3649,33 @@ void MayaScape::HandleSceneUpdate(StringHash eventType, VariantMap &eventData) {
         }
     }
 
+}
+
+void MayaScape::UpdateClientObjects()
+{
+    PODVector<Node*> playerNodes;
+    scene_->GetNodesWithTag(playerNodes, "Player");
+    auto clients = GetSubsystem<Network>()->GetClientConnections();
+    for (auto it = clients.Begin(); it != clients.End(); ++it) {
+        for (auto it2 = playerNodes.Begin(); it2 != playerNodes.End(); ++it2) {
+            if ((*it2)->GetVar("GUID").GetString() == (*it)->GetGUID()) {
+                if (!peers_[(*it)]) {
+                    peers_[(*it)] = new Peer(context_);
+                    peers_[(*it)]->SetConnection((*it));
+                    peers_[(*it)]->SetScene(scene_);
+                }
+                peers_[(*it)]->SetNode((*it2));
+            }
+        }
+    }
+    for (auto it2 = playerNodes.Begin(); it2 != playerNodes.End(); ++it2) {
+        if ((*it2)->GetVar("GUID").GetString() == GetSubsystem<Network>()->GetGUID()) {
+            if (!peers_[GetSubsystem<Network>()->GetServerConnection()]) {
+                peers_[GetSubsystem<Network>()->GetServerConnection()] = new Peer(context_);
+                peers_[GetSubsystem<Network>()->GetServerConnection()]->SetConnection(GetSubsystem<Network>()->GetServerConnection());
+                peers_[GetSubsystem<Network>()->GetServerConnection()]->SetScene(scene_);
+            }
+            peers_[GetSubsystem<Network>()->GetServerConnection()]->SetNode(*it2);
+        }
+    }
 }

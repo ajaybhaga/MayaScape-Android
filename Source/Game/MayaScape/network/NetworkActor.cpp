@@ -80,10 +80,9 @@ NetworkActor::~NetworkActor() {
         vehicle_->Remove();
     }
 
-    if (nodeInfo_) {
+    if (node_) {
         URHO3D_LOGINFOF("**** DESTROYING CLIENT NODE OBJECT -> %d", this->id_);
-//        nodeInfo_->RemoveAllChildren();
-        nodeInfo_->Remove();
+        node_->Remove();
     }
 
     created_ = false;
@@ -100,8 +99,7 @@ void NetworkActor::RegisterObject(Context *context) {
 
     // These macros register the class attributes to the Context for automatic load / save handling.
     // We specify the Default attribute mode which means it will be used both for saving into file, and network replication
-    URHO3D_ATTRIBUTE("Controls Yaw", float, controls_.yaw_, 0.0f, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Controls Pitch", float, controls_.pitch_, 0.0f, AM_DEFAULT);
+    //URHO3D_ATTRIBUTE("Controls Yaw" int, controls_.buttons_, 0.0f, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Speed", float, speed_, 0.0f, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Turning Velocity", float, turningVelocity_, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
@@ -192,7 +190,9 @@ void NetworkActor::Create() {
     if (!created_) {
             ResourceCache *cache = GetSubsystem<ResourceCache>();
 
-            // Init vehicle
+            node_ = GetNode();
+
+        // Init vehicle
             Node *vehicleNode = GetScene()->CreateChild("Vehicle", REPLICATED);
 
             // Default at (0,300,0) above terrain before we set location
@@ -213,7 +213,6 @@ void NetworkActor::Create() {
 
             vehicleNode->SetRotation(Quaternion(0.0, -90.0, 0.0));
 
-            nodeInfo_ = GetNode();
 
             // create text3d client info node LOCALLY
             Node* floatTextNode = GetNode()->CreateChild("Float Text", LOCAL);
@@ -227,6 +226,61 @@ void NetworkActor::Create() {
 
     // Instance created
     created_ = true;
+}
+
+void NetworkActor::SetScene(Scene* scene)
+{
+    scene_ = scene;
+}
+
+void NetworkActor::Create(Connection* connection)
+{
+    connection_ = connection;
+
+    auto* cache = GetSubsystem<ResourceCache>();
+
+    // Create the scene node & visual representation. This will be a replicated object
+    node_ = scene_->CreateChild();
+    node_->AddTag("Player");
+    node_->SetVar("GUID", connection->GetGUID());
+    node_->SetPosition(Vector3(0, 10, 0));
+    node_->SetScale(0.5f);
+    auto* ballObject = node_->CreateComponent<StaticModel>();
+    ballObject->SetModel(cache->GetResource<Model>("Models/Sphere.mdl"));
+    ballObject->SetMaterial(cache->GetResource<Material>("Materials/StoneSmall.xml"));
+
+    auto* titleText = node_->CreateComponent<Text3D>(REPLICATED);
+    titleText->SetText(connection->GetGUID());
+    titleText->SetFaceCameraMode(FaceCameraMode::FC_LOOKAT_XYZ);
+    titleText->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.sdf"), 30);
+
+    // Create the physics components
+    auto* body = node_->CreateComponent<RigidBody>();
+    body->SetMass(1.0f);
+    body->SetFriction(1.0f);
+    // In addition to friction, use motion damping so that the ball can not accelerate limitlessly
+    body->SetLinearDamping(0.5f);
+    body->SetAngularDamping(0.5f);
+    //body->SetLinearVelocity(Vector3(0.1, 1, 0.1));
+    auto* shape = node_->CreateComponent<CollisionShape>();
+    shape->SetSphere(1.0f);
+
+    // Create a random colored point light at the ball so that can see better where is going
+    auto* light = node_->CreateComponent<Light>();
+    light->SetRange(3.0f);
+    light->SetColor(Color(0.5f + ((unsigned)Rand() & 1u) * 0.5f, 0.5f + ((unsigned)Rand() & 1u) * 0.5f, 0.5f + ((unsigned)Rand() & 1u) * 0.5f));
+
+    //node_->SetScale(1.0f);
+}
+
+void NetworkActor::SetNode(Node* node)
+{
+    node_ = node;
+}
+
+void NetworkActor::SetConnection(Connection* connection)
+{
+    connection_ = connection;
 }
 
 void NetworkActor::SwapMat() {
@@ -256,12 +310,11 @@ void NetworkActor::SetControls(Controls controls) {
 }
 
 void NetworkActor::FixedUpdate(float timeStep) {
-    if (!nodeInfo_ || !created_) {
+    if (!node_ || !created_) {
         return;
     }
 
     // update prev
-    prevControls_ = controls_;
     lastFire_ += timeStep;
 
     // Client will only do local scene updates

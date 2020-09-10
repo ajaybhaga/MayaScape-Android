@@ -57,10 +57,17 @@ public:
 
     virtual void ApplyAttributes();
     virtual void DelayedStart();
-    virtual void Create();
+//    virtual void Create();
 
     void DebugDraw(const Color &color);
     void ComputeSteerForce();
+
+    void Create(Connection* connection);
+    void SetScene(Scene* scene);
+    void SetConnection(Connection* connection);
+    const WeakPtr<Connection> GetConnection() const { return connection_; }
+    void SetNode(Node* node);
+    const Node* GetNode() const { return node_; };
 
     /// Parameter function
     int GetLife() { return life_; }
@@ -144,12 +151,23 @@ public:
     virtual void FixedUpdate(float timeStep);
 
     String name_;
-    WeakPtr<Node> nodeInfo_;
-    Controls prevControls_;
+//    WeakPtr<Node> nodeInfo_;
+//    Controls prevControls_;
 
     /// The controllable vehicle component.
     SharedPtr<Vehicle> vehicle_;
     SharedPtr<Text3D> floatingText_;
+
+
+    // PEER
+    /// Movement controls. Assigned by the main program each physics update step.
+    Controls controls_;
+    SharedPtr<Node> node_;
+    WeakPtr<Connection> connection_;
+    WeakPtr<Scene> scene_;
+    Timer updateTimer_;
+    ///
+
 
     bool isServer_;
     bool created_;

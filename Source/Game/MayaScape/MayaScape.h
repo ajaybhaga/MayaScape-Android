@@ -218,6 +218,8 @@ private:
     void apply_input(Node* playerNode, const Controls& controls);
     void apply_input(Connection* connection, const Controls& controls);
 
+    void UpdateClientObjects();
+
     String clientName_;
     String initialScene_;
     bool started_; // Is Game started?
