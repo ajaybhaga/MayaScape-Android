@@ -372,6 +372,8 @@ void Server::SendPlayerStateMsg(Connection* connection)
 
 void Server::HandleClientIdentity(StringHash eventType, VariantMap& eventData)
 {
+    // SERVER CODE
+
 	using namespace ClientIdentity;
     URHO3D_LOGINFO("HandleClientIdentity");
 
@@ -428,34 +430,47 @@ void Server::HandleNetworkUpdateSent(StringHash eventType, VariantMap& eventData
 
             // CLIENT CODE
             if (clientObjectID_) {
+                // ClientObjectID_ refers to PlayerNode->ID which is parent of NetworkActor
 
-                Node *clientNode = scene_->GetChild(clientObjectID_);
+//                Node *clientNode = scene_->GetChild(clientObjectID_);
+                PODVector<Node*> playerNodes;
+                scene_->GetNodesWithTag(playerNodes, "Player");
+//                auto clients = GetSubsystem<Network>()->GetClientConnections();
+//                for (auto it = clients.Begin(); it != clients.End(); ++it) {
+                    for (auto it2 = playerNodes.Begin(); it2 != playerNodes.End(); ++it2) {
 
-                // TODO: Issue
-                // Cannot retrieve replicated nodes on client
-                if (clientNode) {
+                        auto clientNode = (*it2);
+                        NetworkActor *networkActor = clientNode->GetDerivedComponent<NetworkActor>(true);
 
-                    /*
+                        if (networkActor) {
+                            networkActor->ClearControls();
+                        }
+
+                    }
+ /*
+                        if ((*it2)->GetVar("GUID").GetString() == (*it)->GetGUID()) {
+                            if (!peers_[(*it)]) {
+                                peers_[(*it)] = new Peer(context_);
+                                peers_[(*it)]->SetConnection((*it));
+                                peers_[(*it)]->SetScene(scene_);
+                            }
+                            peers_[(*it)]->SetNode((*it2));
+                        }
+*/
                     if (first) {
                         File saveFile(context_,
                                       GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/MayaScape_FIRST.xml",
                                       FILE_WRITE);
-                        scene_->SaveXML(saveFile);
+                        serverConnection->GetScene()->SaveXML(saveFile);
                         first = false;
-                    }*/
+                    }
 
 //                serverConnection->GetScene()->MarkNetworkUpdate();
 
                     //serverConnection->SetScene(scene_);
 
-                    NetworkActor *networkActor = clientNode->GetDerivedComponent<NetworkActor>(true);
-
-                    if (networkActor) {
-                        networkActor->ClearControls();
-                    }
                 }
             }
-        }
     } else {
         // On running server
         if (network->IsServerRunning()) {
@@ -542,10 +557,6 @@ void Server::DestroyPlayer(Connection* connection) {
 
     serverObjects_.Erase(connection);
     actorMap_.Erase(connection);
-
-    // Clear removed replicated nodes
-    scene_->Clear(true, false);
-//    scene_->MarkReplicationDirty(scene_);
 }
 
 void Server::HandleClientDisconnected(StringHash eventType, VariantMap& eventData)
