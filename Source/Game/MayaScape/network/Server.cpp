@@ -115,10 +115,10 @@ Node* Server::CreatePlayer(Connection* connection) {
     Node *playerNode = scene_->CreateChild("Player", REPLICATED);
 
     // Player is replaced with NetworkActor -> which is a Player
-   // NetworkActor* actorClientObj_ = (NetworkActor*)playerNode->CreateComponent(clientHash_);
+    NetworkActor* actorClientObj_ = (NetworkActor*)playerNode->CreateComponent(clientHash_);
 
     // Store the player in map
-    actorMap_[connection] =  new NetworkActor(context_);
+    actorMap_[connection] = actorClientObj_;
     actorMap_[connection]->SetScene(scene_);
     actorMap_[connection]->Create(connection);
 
