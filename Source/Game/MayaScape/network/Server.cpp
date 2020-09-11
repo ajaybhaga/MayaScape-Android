@@ -557,10 +557,6 @@ void Server::DestroyPlayer(Connection* connection) {
 
     serverObjects_.Erase(connection);
     actorMap_.Erase(connection);
-
-    // Clear removed replicated nodes
-    scene_->Clear(true, false);
-//    scene_->MarkReplicationDirty(scene_);
 }
 
 void Server::HandleClientDisconnected(StringHash eventType, VariantMap& eventData)
