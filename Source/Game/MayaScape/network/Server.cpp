@@ -252,7 +252,23 @@ void Server::UpdateActors(float timeStep) {
                     // Apply update to actor
                     actor->FixedUpdate(timeStep);
 
-                    // If actor has a vehicle, snap the actor to vehicle
+            PODVector<Node*> playerNodes;
+            scene_->GetNodesWithTag(playerNodes, "Player");
+
+/*
+                    for (auto it2 = playerNodes.Begin(); it2 != playerNodes.End(); ++it2) {
+                        if ((*it2)->GetVar("GUID").GetString() == (*it)->GetGUID()) {
+                            if (!peers_[(*it)]) {
+                                peers_[(*it)] = new Peer(context_);
+                                peers_[(*it)]->SetConnection((*it));
+                                peers_[(*it)]->SetScene(scene_);
+                            }
+                            peers_[(*it)]->SetNode((*it2));
+                        }
+                    }*/
+
+
+                // If actor has a vehicle, snap the actor to vehicle
                    // if (actor->vehicle_)
                    //     actor->GetNode()->SetPosition(actor->vehicle_->GetNode()->GetPosition());
 
