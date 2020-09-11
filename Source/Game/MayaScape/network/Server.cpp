@@ -432,6 +432,7 @@ void Server::HandleNetworkUpdateSent(StringHash eventType, VariantMap& eventData
             if (clientObjectID_) {
                 // ClientObjectID_ refers to PlayerNode->ID which is parent of NetworkActor
 
+
 //                Node *clientNode = scene_->GetChild(clientObjectID_);
                 PODVector<Node*> playerNodes;
                 scene_->GetNodesWithTag(playerNodes, "Player");
