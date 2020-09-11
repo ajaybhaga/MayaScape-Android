@@ -372,6 +372,8 @@ void Server::SendPlayerStateMsg(Connection* connection)
 
 void Server::HandleClientIdentity(StringHash eventType, VariantMap& eventData)
 {
+    // SERVER CODE
+
 	using namespace ClientIdentity;
     URHO3D_LOGINFO("HandleClientIdentity");
 
@@ -428,6 +430,7 @@ void Server::HandleNetworkUpdateSent(StringHash eventType, VariantMap& eventData
 
             // CLIENT CODE
             if (clientObjectID_) {
+                // ClientObjectID_ refers to PlayerNode->ID which is parent of NetworkActor
 
                 Node *clientNode = scene_->GetChild(clientObjectID_);
 
