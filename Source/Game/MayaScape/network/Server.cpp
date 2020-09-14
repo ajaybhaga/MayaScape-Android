@@ -412,11 +412,21 @@ void Server::HandleClientIdentity(StringHash eventType, VariantMap& eventData)
 
 	using namespace ClientIdentity;
     URHO3D_LOGINFO("HandleClientIdentity");
-
     // When a client connects, assign to scene to begin scene replication
     Connection* newConnection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
+
+
+    String username = String(newConnection->GetIdentity()["UserName"]);
+    String name = newConnection->identity_["UserName"].GetString();
+    int colorIdx = newConnection->identity_["ColorIdx"].GetInt();
+
+    if (name.Empty())
+        return;
+
     // Transmit scene from server to client
     newConnection->SetScene(scene_);
+
+
 
     URHO3D_LOGINFO("HandleClientIdentity - client assigned for scene replication.");
     URHO3D_LOGINFOF("Server: Scene checksum -> %s", ToStringHex(scene_->GetChecksum()).CString());
