@@ -298,7 +298,6 @@ void Server::UpdatePhysicsPreStep(const Controls &controls)
     if (serverConnection)
     {
   //      URHO3D_LOGINFO("Client: set controls for client sent to server");
-
         serverConnection->SetControls(controls);
     }
     // Server: apply controls to client objects
