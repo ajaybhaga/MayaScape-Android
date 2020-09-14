@@ -224,8 +224,8 @@ void Server::UpdateClient(Connection* connection) {
         NetworkActor *actor = actorMap_[connection];
 
         if (actor) {
-            actor->SetConnection(connection);
-            actor->SetScene(scene_);
+ //           actor->SetConnection(connection);
+//            actor->SetScene(scene_);
         }
   //  }
 }
@@ -247,8 +247,8 @@ void Server::UpdateActors(float timeStep) {
             NetworkActor *actor = actorMap_[connection];
 
             if (actor) {
-                    actor->SetConnection(connection);
-                    actor->SetScene(scene_);
+                  //  actor->SetConnection(connection);
+                  //  actor->SetScene(scene_);
                     // Apply update to actor
                     actor->FixedUpdate(timeStep);
 
@@ -318,7 +318,7 @@ void Server::UpdatePhysicsPreStep(const Controls &controls)
             if (!clientNode)
                 continue;
 
-            ClientObj* clientObj = clientNode->GetDerivedComponent<ClientObj>();
+            NetworkActor* clientObj = clientNode->GetDerivedComponent<NetworkActor>(true);
 
             if (clientObj)
             {
@@ -326,7 +326,7 @@ void Server::UpdatePhysicsPreStep(const Controls &controls)
 
                 // TODO: Instead of applying controls right away - add to input buffer
                 // Based on input buffer size, control client input demand
-
+                clientObj->SetScene(scene_);
                 clientObj->SetControls(controls);
                 // Apply control to actor
                 actorMap_[connection]->SetControls(controls);
@@ -493,11 +493,12 @@ void Server::HandleNetworkUpdateSent(StringHash eventType, VariantMap& eventData
                 if (!clientNode)
                     continue;
 
-                ClientObj *clientObj = clientNode->GetDerivedComponent<ClientObj>();
+                NetworkActor* clientObj = clientNode->GetDerivedComponent<NetworkActor>(true);
 
                 if (clientObj) {
 //                    URHO3D_LOGINFOF("Server: set controls for client [%d] -> %s", clientNode->GetID(), ToStringHex(controls.buttons_).CString());
                     clientObj->SetControls(controls);
+                    clientObj->SetScene(scene_);
 
                 }
             }
