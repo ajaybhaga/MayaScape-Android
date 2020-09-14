@@ -326,7 +326,7 @@ void Server::UpdatePhysicsPreStep(const Controls &controls)
 
                 // TODO: Instead of applying controls right away - add to input buffer
                 // Based on input buffer size, control client input demand
-                clientObj->SetScene(scene_);
+                //clientObj->SetScene(scene_);
                 clientObj->SetControls(controls);
                 // Apply control to actor
                 actorMap_[connection]->SetControls(controls);
@@ -498,7 +498,7 @@ void Server::HandleNetworkUpdateSent(StringHash eventType, VariantMap& eventData
                 if (clientObj) {
 //                    URHO3D_LOGINFOF("Server: set controls for client [%d] -> %s", clientNode->GetID(), ToStringHex(controls.buttons_).CString());
                     clientObj->SetControls(controls);
-                    clientObj->SetScene(scene_);
+//                    clientObj->SetScene(scene_);
 
                 }
             }
