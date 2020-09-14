@@ -112,29 +112,15 @@ void Server::Disconnect()
 
 Node* Server::CreatePlayer(Connection* connection) {
 
+    /*
     Node *playerNode = scene_->CreateChild("Player", REPLICATED);
-
+*/
     // Player is replaced with NetworkActor -> which is a Player
-    NetworkActor* actorClientObj_ = (NetworkActor*)playerNode->CreateComponent(clientHash_);
+//    NetworkActor* actorClientObj_ = (NetworkActor*)playerNode->CreateComponent(clientHash_);
 
-    // Store the player in map
-    actorMap_[connection] = actorClientObj_;
-    actorMap_[connection]->SetScene(scene_);
-    actorMap_[connection]->Create(connection);
-
-//    player_->GetNode()->SetPosition(Vector3(0, 0, 0));
-
-    // If actor has a vehicle, snap the actor to vehicle
-//    if (player_->vehicle_)
-//        player_->GetNode()->SetPosition(player_->vehicle_->GetNode()->GetPosition());
-
-//    player_->SetWaypoints(&waypointsWorld_);
-
-    playerNode->SetRotation(Quaternion(0.0, -0.0, -0.0));
 
     // set identity
-    if (connection)
-    {
+    if (connection) {
 
         String name = connection->identity_["UserName"].GetString();
         int colorIdx = connection->identity_["ColorIdx"].GetInt();
@@ -144,8 +130,56 @@ Node* Server::CreatePlayer(Connection* connection) {
         URHO3D_LOGINFOF("HandleClientConnected - data: [%s, %d]", name.CString(), colorIdx);
         // Store login name with connection
         loginList_.Populate(name.CString(), connection);
-    }
 
+        /// 1.Get the username of the player
+        VariantMap identity = connection->GetIdentity();
+        String username = String(identity["UserName"]);
+
+        /// 2.Create a new fighter for the client
+        SharedPtr<Node> playerNode(scene_->CreateChild(username, REPLICATED));
+        playerNode->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
+        NetworkActor *actorClientObj_ = playerNode->CreateComponent<NetworkActor>();
+
+        // Store the player in map
+        actorMap_[connection] = actorClientObj_;
+        //actorMap_[connection]->SetScene(scene_);
+        actorMap_[connection]->Create(connection);
+
+        // Give ownership to client
+        playerNode->SetOwner(connection);
+
+        /// 2.5 Create the label of the fighter
+//    CreateFlag(playerNode, username, -0.15f, 0.4f);
+        // Push the new comer into the map
+//    fightersmap_[username] = fighter;
+        // Send remote event
+        //  connection->SendRemoteEvent(RemoteEventes::RE_PLAYERSPAWNED, true);
+        // Give the ownership to the client
+//    fighter->SetOwner(connection);
+
+/*
+    /// 3.Create a new camera	follows the fighter
+    Graphics* graphics = GetSubsystem<Graphics>();
+    String cameraname = "camera_" + username;
+    Node* cameraNode = fighter->CreateChild(cameraname, REPLICATED);
+    //Node* cameraNode = scene_->CreateChild(cameraname, REPLICATED);
+    cameraNode->SetPosition(Vector3(0.0f, 0.0f, -10.0f));
+    Camera* camera = cameraNode->CreateComponent<Camera>();
+    camera->SetOrthographic(true);
+    camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE * 1.0f);
+    // Give the ownership to the client
+    cameraNode->SetOwner(connection);
+*/
+//    player_->GetNode()->SetPosition(Vector3(0, 0, 0));
+
+        // If actor has a vehicle, snap the actor to vehicle
+//    if (player_->vehicle_)
+//        player_->GetNode()->SetPosition(player_->vehicle_->GetNode()->GetPosition());
+
+//    player_->SetWaypoints(&waypointsWorld_);
+
+        playerNode->SetRotation(Quaternion(0.0, -0.0, -0.0));
+    }
 
     /*
     // Register player on CSP server
