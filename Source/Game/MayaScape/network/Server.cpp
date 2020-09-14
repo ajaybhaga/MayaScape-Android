@@ -179,7 +179,11 @@ Node* Server::CreatePlayer(Connection* connection) {
 //    player_->SetWaypoints(&waypointsWorld_);
 
         playerNode->SetRotation(Quaternion(0.0, -0.0, -0.0));
+        return playerNode;
+
     }
+
+    return nullptr;
 
     /*
     // Register player on CSP server
@@ -193,7 +197,6 @@ Node* Server::CreatePlayer(Connection* connection) {
     // Assign player node to csp snapshot
     csp->add_node(playerNode);*/
 
-    return playerNode;
 }
 
 void Server::SubscribeToEvents()
