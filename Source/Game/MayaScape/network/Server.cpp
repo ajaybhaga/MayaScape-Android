@@ -257,6 +257,8 @@ void Server::UpdateClient(Connection* connection) {
     // Connected to running server
 //    if (network->GetServerConnection()->IsConnected()) {
 
+        scene_ = connection->GetScene();
+
         // Get the object this connection is controlling
         NetworkActor *actor = actorMap_[connection];
 
@@ -504,13 +506,16 @@ void Server::HandleNetworkUpdateSent(StringHash eventType, VariantMap& eventData
                             peers_[(*it)]->SetNode((*it2));
                         }
 */
+
+
+ /*
                     if (first) {
                         File saveFile(context_,
                                       GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/MayaScape_FIRST.xml",
                                       FILE_WRITE);
                         serverConnection->GetScene()->SaveXML(saveFile);
                         first = false;
-                    }
+                    }*/
 
 //                serverConnection->GetScene()->MarkNetworkUpdate();
 

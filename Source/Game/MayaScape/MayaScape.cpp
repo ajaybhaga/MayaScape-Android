@@ -2987,8 +2987,9 @@ void MayaScape::HandlePhysicsPreStep(StringHash eventType, VariantMap &eventData
             // CLIENT UPDATE
             auto network = GetSubsystem<Network>();
             auto serverConnection = network->GetServerConnection();
-//            scene_ = serverConnection->GetScene();
-            server->UpdateClient(serverConnection);
+         //   scene_ = serverConnection->GetScene();
+          //  server->UpdateClient(serverConnection);
+//            scene_ =
         }
         /*
         // This function is different on the client and server. The client collects controls (WASD controls + yaw angle)
@@ -3096,7 +3097,8 @@ void MayaScape::HandleConnect(StringHash eventType, VariantMap &eventData) {
     String name = buffer;
     URHO3D_LOGINFOF("client idx=%i, username=%s", idx, name.CString());
 
-    VariantMap &identity = GetEventDataMap();
+//    VariantMap &identity = GetEventDataMap();
+    VariantMap identity;
     identity["UserName"] = name;
     identity["ColorIdx"] = idx;
 
@@ -3167,12 +3169,6 @@ void MayaScape::HandleConnect(StringHash eventType, VariantMap &eventData) {
                 light->SetSpecularIntensity(0.5f);
         */
         URHO3D_LOGINFOF("client idx=%i, username=%s", idx, name.CString());
-
-//         server-
-
-//        scene_->Clear(true, false);
- //       scene_->SetScene()
-
 
     } else {
         URHO3D_LOGINFOF("Connection to server failed =%s", address.CString());

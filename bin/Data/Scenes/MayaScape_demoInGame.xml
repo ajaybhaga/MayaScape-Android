@@ -4,11 +4,11 @@
 	<attribute name="Time Scale" value="1" />
 	<attribute name="Smoothing Constant" value="50" />
 	<attribute name="Snap Threshold" value="5" />
-	<attribute name="Elapsed Time" value="53.4173" />
+	<attribute name="Elapsed Time" value="23.1739" />
 	<attribute name="Next Replicated Node ID" value="1" />
 	<attribute name="Next Replicated Component ID" value="1" />
-	<attribute name="Next Local Node ID" value="16778019" />
-	<attribute name="Next Local Component ID" value="16778044" />
+	<attribute name="Next Local Node ID" value="16777507" />
+	<attribute name="Next Local Component ID" value="16777533" />
 	<attribute name="Variables" />
 	<attribute name="Variable Names" value="" />
 	<component type="Octree" id="16777216" />
@@ -319,7 +319,7 @@
 				<attribute name="Cast Shadows" value="true" />
 			</component>
 			<component type="RigidBody" id="16777501">
-				<attribute name="Physics Rotation" value="0.707043 -0.00946766 -0.00946766 -0.707043" />
+				<attribute name="Physics Rotation" value="0.707043 -0.00946764 -0.00946764 -0.707043" />
 				<attribute name="Physics Position" value="-446.341 2.29922 -481.463" />
 				<attribute name="Collision Layer" value="2" />
 			</component>
@@ -606,5 +606,70 @@
 			<attribute name="Bottom Left Color" value="0 1 0 1" />
 			<attribute name="Bottom Right Color" value="0 1 0 1" />
 		</component>
+	</node>
+	<node id="12">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="" />
+		<attribute name="Tags" />
+		<attribute name="Position" value="0 0 0" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<component type="SmoothedTransform" id="16777529" />
+	</node>
+	<node id="5251596">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="" />
+		<attribute name="Tags" />
+		<attribute name="Position" value="0 0 0" />
+		<attribute name="Rotation" value="0.378679 -0.823793 0.421862 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<component type="SmoothedTransform" id="16777530" />
+	</node>
+	<node id="80908">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="" />
+		<attribute name="Tags">
+			<string value="yer" />
+			<string value="?" />
+			<string value="?�����ǕC]���&#08;&#13;Z-%��y&#24;" />
+			<string value="&#05;[ڕ�&#02;" />
+			<string value="&#12;&#06;" />
+			<string value="�=0�Models/Sphere.mdl" />
+			<string value="��&#18;�&#01;Materials/StoneSmall.xml" />
+			<string value="�PU&#27;&#03;" />
+			<string value="&#12;&#10;&#04;" />
+			<string value="����Fonts/BlueHighway.sdf" />
+			<string value="�A&#03;" />
+			<string value="&#13;\&#30;�&#04;" />
+			<string value="&#12;F&#06;&#04;" />
+			<string value="�?" />
+			<string value="�?&#20;g{@Hi��aϺ?" />
+			<string value="?&#06;�&#10;H&#09;65O&#31;Yj&#05;" />
+			<string value="&#12;&#02;" />
+			<string value="&#01;" />
+			<string value="�)�r&#06;" />
+			<string value="&#12;&#04;&quot;" />
+			<string value="@@&#16;G_n" />
+		</attribute>
+		<attribute name="Position" value="0 0 0" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<component type="SmoothedTransform" id="16777531" />
+	</node>
+	<node id="5650956">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="" />
+		<attribute name="Tags" />
+		<attribute name="Position" value="0 0 0" />
+		<attribute name="Rotation" value="-0.753794 0.460805 -0.152979 -0.442776" />
+		<attribute name="Scale" value="6.97695e+22 -1.5882e-23 -1.58821e-23" />
+		<attribute name="Variables">
+			<variant hash="1055044479" type="None" value="" />
+			<variant hash="0" type="None" value="" />
+		</attribute>
+		<component type="SmoothedTransform" id="16777532" />
 	</node>
 </scene>
