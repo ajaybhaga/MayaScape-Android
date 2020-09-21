@@ -124,7 +124,6 @@ Node* Server::CreatePlayer(Connection* connection) {
 
         String name = connection->identity_["UserName"].GetString();
         int colorIdx = connection->identity_["ColorIdx"].GetInt();
-        actorMap_[connection]->SetClientInfo(name, colorIdx);
 
         URHO3D_LOGINFOF("client identity name=%s", name.CString());
         URHO3D_LOGINFOF("HandleClientConnected - data: [%s, %d]", name.CString(), colorIdx);
@@ -142,8 +141,9 @@ Node* Server::CreatePlayer(Connection* connection) {
 
         // Store the player in map
         actorMap_[connection] = actorClientObj_;
-        //actorMap_[connection]->SetScene(scene_);
+        actorMap_[connection]->SetScene(scene_);
         actorMap_[connection]->Create(connection);
+        actorMap_[connection]->SetClientInfo(name, colorIdx);
 
         // Give ownership to client
         playerNode->SetOwner(connection);
