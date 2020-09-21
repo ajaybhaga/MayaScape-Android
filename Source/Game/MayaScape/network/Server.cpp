@@ -565,9 +565,18 @@ void Server::HandleClientConnected(StringHash eventType, VariantMap& eventData)
 {
     using namespace ClientConnected;
 
-    URHO3D_LOGINFO("HandleClientConnected");
+    // When a client connects, assign to scene to begin scene replication
+    auto* newConnection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
+    newConnection->SetScene(scene_);
+/*
+    // Then create a controllable object for that client
+    Node* newObject = CreateControllableObject();
+    serverObjects_[newConnection] = newObject;
 
-
+    // Finally send the object's node ID using a remote event
+    VariantMap remoteEventData;
+    remoteEventData[P_ID] = newObject->GetID();
+    newConnection->SendRemoteEvent(E_CLIENTOBJECTID, true, remoteEventData);*/
 }
 
 void Server::DestroyPlayer(Connection* connection) {
