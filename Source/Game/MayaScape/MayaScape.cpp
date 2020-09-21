@@ -3097,7 +3097,6 @@ void MayaScape::HandleConnect(StringHash eventType, VariantMap &eventData) {
     String name = buffer;
     URHO3D_LOGINFOF("client idx=%i, username=%s", idx, name.CString());
 
-//    VariantMap &identity = GetEventDataMap();
     VariantMap identity;
     identity["UserName"] = name;
     identity["ColorIdx"] = idx;
@@ -3108,9 +3107,6 @@ void MayaScape::HandleConnect(StringHash eventType, VariantMap &eventData) {
 
         URHO3D_LOGINFOF("client identity name=%s", name.CString());
         URHO3D_LOGINFOF("HandleClientConnected - data: [%s, %d]", name.CString(), idx);
-
-        // Clear client replicated objects
-//        scene_->MarkNetworkUpdate();
 
         // Store in local login list
         loginList_.Push(name.CString());
@@ -3169,6 +3165,8 @@ void MayaScape::HandleConnect(StringHash eventType, VariantMap &eventData) {
                 light->SetSpecularIntensity(0.5f);
         */
         URHO3D_LOGINFOF("client idx=%i, username=%s", idx, name.CString());
+        // Clear client replicated objects
+        scene_->MarkNetworkUpdate();
 
     } else {
         URHO3D_LOGINFOF("Connection to server failed =%s", address.CString());
@@ -3253,11 +3251,15 @@ void MayaScape::HandleClientObjectID(StringHash eventType, VariantMap &eventData
 
     URHO3D_LOGINFOF("Client -> scene checksum: %d", ToStringHex(scene_->GetChecksum()).CString());
 
-    /*
+//    scene_->MarkNetworkUpdate();
+
     auto *network = GetSubsystem<Network>();
     Connection *serverConnection = network->GetServerConnection();
 
     if (serverConnection) {
+
+        scene_ = serverConnection->GetScene();
+        /*
         // A VectorBuffer object is convenient for constructing a message to send
         VectorBuffer msg;
         msg.WriteString("hello!");
@@ -3265,9 +3267,9 @@ void MayaScape::HandleClientObjectID(StringHash eventType, VariantMap &eventData
         serverConnection->SendMessage(MSG_NODE_ERROR, true, true, msg);
         // Empty the text edit after sending
         textEdit_->SetText(String::EMPTY);
-
-        URHO3D_LOGINFOF("Client -> sent node error message: %s", msg.GetData());
-    }*/
+*/
+   //     URHO3D_LOGINFOF("Client -> sent node error message: %s", msg.GetData());
+    }
 }
 
 
