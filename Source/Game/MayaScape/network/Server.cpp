@@ -141,6 +141,7 @@ Node* Server::CreatePlayer(Connection* connection) {
 
         // Store the player in map
         actorMap_[connection] = actorClientObj_;
+        actorMap_[connection]->SetScene(scene_);
         actorMap_[connection]->Create(connection);
         actorMap_[connection]->SetClientInfo(name, colorIdx);
 
@@ -425,7 +426,7 @@ void Server::HandleClientIdentity(StringHash eventType, VariantMap& eventData)
         return;
 
     // Transmit scene from server to client
-    newConnection->SetScene(scene_);
+ //   newConnection->SetScene(scene_);
 
 
 
