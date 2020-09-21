@@ -189,7 +189,7 @@ void NetworkActor::Create(Connection* connection)
     auto* cache = GetSubsystem<ResourceCache>();
 
     // Create the scene node & visual representation. This will be a replicated object
-    node_ = scene_->CreateChild();
+    node_ = scene_->CreateChild("NetworkActor", REPLICATED);
     node_->AddTag("Player");
 //    node_->SetVar("GUID", connection->GetGUID());
     node_->SetPosition(Vector3(0, 10, 0));
