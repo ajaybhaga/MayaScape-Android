@@ -2987,7 +2987,7 @@ void MayaScape::HandlePhysicsPreStep(StringHash eventType, VariantMap &eventData
             // CLIENT UPDATE
             auto network = GetSubsystem<Network>();
             auto serverConnection = network->GetServerConnection();
-         //   scene_ = serverConnection->GetScene();
+            scene_ = serverConnection->GetScene();
           //  server->UpdateClient(serverConnection);
 //            scene_ =
         }
@@ -3244,6 +3244,7 @@ void MayaScape::HandleClientObjectID(StringHash eventType, VariantMap &eventData
 
     URHO3D_LOGINFO("*** HandleClientObjectID");
 
+
     // Client stores client object id
     loginClientObjectID_ = eventData[ClientObjectID::P_ID].GetUInt();
 
@@ -3258,7 +3259,7 @@ void MayaScape::HandleClientObjectID(StringHash eventType, VariantMap &eventData
 
     if (serverConnection) {
 
-        scene_ = serverConnection->GetScene();
+//        scene_ = serverConnection->GetScene();
         /*
         // A VectorBuffer object is convenient for constructing a message to send
         VectorBuffer msg;
