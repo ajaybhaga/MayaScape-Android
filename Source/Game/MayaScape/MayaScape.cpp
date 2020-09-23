@@ -3259,7 +3259,9 @@ void MayaScape::HandleClientObjectID(StringHash eventType, VariantMap &eventData
 
     if (serverConnection) {
 
-//        scene_ = serverConnection->GetScene();
+        scene_ = serverConnection->GetScene();
+
+        SaveScene(true);
         /*
         // A VectorBuffer object is convenient for constructing a message to send
         VectorBuffer msg;
