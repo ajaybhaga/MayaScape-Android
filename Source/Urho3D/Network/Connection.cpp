@@ -596,7 +596,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
     }
 
     unsigned nodeIDx = msg.ReadNetID();
-    URHO3D_LOGINFOF("PROCESS SCENE UPDATE: %u checksum %s", nodeIDx, ToStringHex(scene_->GetChecksum()).CString());
+    URHO3D_LOGINFOF("[msgID=%d] PROCESS SCENE UPDATE: %u", msgID, nodeIDx);
 
     if (!scene_)
         return;
@@ -605,6 +605,8 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
     {
     case MSG_CREATENODE:
         {
+            URHO3D_LOGINFOF("[msgID=%d] MSG_CREATENODE", msgID);
+
             unsigned nodeID = msg.ReadNetID();
             // In case of the root node (scene), it should already exist. Do not create in that case
             Node* node = scene_->GetNode(nodeID);
@@ -665,6 +667,8 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
 
     case MSG_NODEDELTAUPDATE:
         {
+            URHO3D_LOGINFOF("[msgID=%d] MSG_NODEDELTAUPDATE", msgID);
+
             unsigned nodeID = msg.ReadNetID();
             Node* node = scene_->GetNode(nodeID);
             if (node)
@@ -687,6 +691,8 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
 
     case MSG_NODELATESTDATA:
         {
+            URHO3D_LOGINFOF("[msgID=%d] MSG_NODELATESTDATA", msgID);
+
             unsigned nodeID = msg.ReadNetID();
             Node* node = scene_->GetNode(nodeID);
             if (node)
@@ -707,6 +713,8 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
 
     case MSG_REMOVENODE:
         {
+            URHO3D_LOGINFOF("[msgID=%d] MSG_REMOVENODE", msgID);
+
             unsigned nodeID = msg.ReadNetID();
             Node* node = scene_->GetNode(nodeID);
             if (node)
@@ -717,6 +725,8 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
 
     case MSG_CREATECOMPONENT:
         {
+            URHO3D_LOGINFOF("[msgID=%d] MSG_CREATECOMPONENT", msgID);
+
             unsigned nodeID = msg.ReadNetID();
             Node* node = scene_->GetNode(nodeID);
             if (node)
@@ -751,6 +761,8 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
 
     case MSG_COMPONENTDELTAUPDATE:
         {
+            URHO3D_LOGINFOF("[msgID=%d] MSG_COMPONENTDELTAUPDATE", msgID);
+
             unsigned componentID = msg.ReadNetID();
             Component* component = scene_->GetComponent(componentID);
             if (component)
@@ -765,6 +777,8 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
 
     case MSG_COMPONENTLATESTDATA:
         {
+            URHO3D_LOGINFOF("[msgID=%d] MSG_COMPONENTLATESTDATA", msgID);
+
             unsigned componentID = msg.ReadNetID();
             Component* component = scene_->GetComponent(componentID);
             if (component)
@@ -784,6 +798,8 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
 
     case MSG_REMOVECOMPONENT:
         {
+            URHO3D_LOGINFOF("[msgID=%d] MSG_REMOVECOMPONENT", msgID);
+
             unsigned componentID = msg.ReadNetID();
             Component* component = scene_->GetComponent(componentID);
             if (component)

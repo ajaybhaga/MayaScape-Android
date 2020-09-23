@@ -3252,7 +3252,6 @@ void MayaScape::HandleClientObjectID(StringHash eventType, VariantMap &eventData
 
     URHO3D_LOGINFOF("Client -> scene checksum: %d", ToStringHex(scene_->GetChecksum()).CString());
 
-//    scene_->MarkNetworkUpdate();
 
     auto *network = GetSubsystem<Network>();
     Connection *serverConnection = network->GetServerConnection();
@@ -3260,8 +3259,9 @@ void MayaScape::HandleClientObjectID(StringHash eventType, VariantMap &eventData
     if (serverConnection) {
 
         scene_ = serverConnection->GetScene();
+        scene_->MarkNetworkUpdate();
 
-        SaveScene(true);
+      //  SaveScene(true);
         /*
         // A VectorBuffer object is convenient for constructing a message to send
         VectorBuffer msg;
