@@ -1002,7 +1002,7 @@ void MayaScape::CreateScene() {
 
     using namespace std;
 
-// Create heightmap terrain with collision
+    // Create heightmap terrain with collision
     Node *terrainNode = scene_->CreateChild("Terrain", LOCAL);
     terrainNode->SetPosition(Vector3::ZERO);
     terrain_ = terrainNode->CreateComponent<Terrain>();
@@ -1482,7 +1482,7 @@ void MayaScape::HandlePlayerStateUpdate(StringHash eventType, VariantMap& eventD
     float steer = eventData[P_STEER].GetFloat();
 
     // Store updated node id
-    playerObjectID_ = id;
+    //playerObjectID_ = id;
     playerVehicleID_ = vehicleId;
 
     URHO3D_LOGINFOF("Client -> HandlePlayerStateUpdate: %d, %d, %d, %f, %f, %f", id, vehicleId, life, rpm, velocity, steer);
@@ -2255,19 +2255,25 @@ void MayaScape::HandlePostUpdate(StringHash eventType, VariantMap &eventData) {
             // CLIENT
 
             Node *actorNode = nullptr;
-            actorNode = scene_->GetNode(playerObjectID_);
+            Network *network = GetSubsystem<Network>();
+            auto serverConnection = network->GetServerConnection();
+            scene_ = serverConnection->GetScene();
 
-            using namespace Update;
-            float timeStep = eventData[P_TIMESTEP].GetFloat();
+            if (playerObjectID_ != 0) {
+                actorNode = scene_->GetNode(playerObjectID_);
 
-            if (actorNode) {
-                // Update player node
-                player_ = static_cast<SharedPtr<Node>>(actorNode);
+                using namespace Update;
+                float timeStep = eventData[P_TIMESTEP].GetFloat();
 
-                // Apply transformations to camera
-                MoveCamera(actorNode, timeStep);
+                if (actorNode) {
+                    // Update player node
+                    player_ = static_cast<SharedPtr<Node>>(actorNode);
+
+                    // Apply transformations to camera
+                    MoveCamera(actorNode, timeStep);
 
 
+                }
             }
 
             instructionsText_->SetVisible(true);
@@ -2921,61 +2927,6 @@ void MayaScape::HandlePhysicsPreStep(StringHash eventType, VariantMap &eventData
         Node *actorNode = nullptr;
         String hudText = "";
 
-        if (playerObjectID_ != 0) {
-            actorNode = scene_->GetNode(playerObjectID_);
-
-            if (actorNode) {
-                // Controllable client network actor (replicated from server based on client controls)
-
-
-                // axis
-                const StringHash axisHashList[SDL_CONTROLLER_AXIS_MAX/2] = { VAR_AXIS_0, VAR_AXIS_1, VAR_AXIS_2 };
-                // left stick - vehicle
-                Variant lStick = ntwkControls_.extraData_[VAR_AXIS_0];
-                Vector2 lAxisVal = lStick.GetVector2();
-
-                // right stick
-                Variant rStick = ntwkControls_.extraData_[VAR_AXIS_1];
-                Vector2 rAxisVal = rStick.GetVector2();
-
-                bool snap = false;
-                ntwkControls_.Set(NTWK_CTRL_LEFT, 0);
-                ntwkControls_.Set(NTWK_CTRL_RIGHT, 0);
-                if (lAxisVal.x_ < -0.4f) {
-                    // left
-                    ntwkControls_.Set(NTWK_CTRL_LEFT, 1);
-                    snap = true;
-                } else if (lAxisVal.x_ > 0.4f) {
-                    // right
-                    ntwkControls_.Set(NTWK_CTRL_RIGHT, 1);
-                    snap = true;
-                }
-
-
-                for (int i = 0; i < hudTextList_.Size(); i++) {
-                    switch (i) {
-                        case 0:
-                            hudText = "Button state: " + String(ntwkControls_.buttons_);
-                            break;
-                        case 1:
-                            hudText = "L axis: " + String(lAxisVal);
-                            break;
-                        case 2:
-                            hudText = "R axis: " + String(rAxisVal);
-                            break;
-                        case 3:
-                            hudText = "snap = " + String(snap);
-                            break;
-                    }
-
-                    hudTextList_[i]->SetText(hudText);
-                }
-
-            }
-
-
-        }
-
 
         server->UpdatePhysicsPreStep(ntwkControls_);
 
@@ -2988,6 +2939,61 @@ void MayaScape::HandlePhysicsPreStep(StringHash eventType, VariantMap &eventData
             auto network = GetSubsystem<Network>();
             auto serverConnection = network->GetServerConnection();
             scene_ = serverConnection->GetScene();
+
+            if (playerObjectID_ != 0) {
+                actorNode = scene_->GetNode(playerObjectID_);
+
+                if (actorNode) {
+                    // Controllable client network actor (replicated from server based on client controls)
+
+
+                    // axis
+                    const StringHash axisHashList[SDL_CONTROLLER_AXIS_MAX/2] = { VAR_AXIS_0, VAR_AXIS_1, VAR_AXIS_2 };
+                    // left stick - vehicle
+                    Variant lStick = ntwkControls_.extraData_[VAR_AXIS_0];
+                    Vector2 lAxisVal = lStick.GetVector2();
+
+                    // right stick
+                    Variant rStick = ntwkControls_.extraData_[VAR_AXIS_1];
+                    Vector2 rAxisVal = rStick.GetVector2();
+
+                    bool snap = false;
+                    ntwkControls_.Set(NTWK_CTRL_LEFT, 0);
+                    ntwkControls_.Set(NTWK_CTRL_RIGHT, 0);
+                    if (lAxisVal.x_ < -0.4f) {
+                        // left
+                        ntwkControls_.Set(NTWK_CTRL_LEFT, 1);
+                        snap = true;
+                    } else if (lAxisVal.x_ > 0.4f) {
+                        // right
+                        ntwkControls_.Set(NTWK_CTRL_RIGHT, 1);
+                        snap = true;
+                    }
+
+
+                    for (int i = 0; i < hudTextList_.Size(); i++) {
+                        switch (i) {
+                            case 0:
+                                hudText = "Button state: " + String(ntwkControls_.buttons_);
+                                break;
+                            case 1:
+                                hudText = "L axis: " + String(lAxisVal);
+                                break;
+                            case 2:
+                                hudText = "R axis: " + String(rAxisVal);
+                                break;
+                            case 3:
+                                hudText = "snap = " + String(snap);
+                                break;
+                        }
+
+                        hudTextList_[i]->SetText(hudText);
+                    }
+
+                }
+
+
+            }
           //  server->UpdateClient(serverConnection);
 //            scene_ =
         }
@@ -3247,8 +3253,10 @@ void MayaScape::HandleClientObjectID(StringHash eventType, VariantMap &eventData
 
     // Client stores client object id
     loginClientObjectID_ = eventData[ClientObjectID::P_ID].GetUInt();
+    playerObjectID_ = loginClientObjectID_;
 
     URHO3D_LOGINFOF("Client -> HandleClientObjectID: %u", loginClientObjectID_);
+
 
     URHO3D_LOGINFOF("Client -> scene checksum: %d", ToStringHex(scene_->GetChecksum()).CString());
 
@@ -3261,7 +3269,7 @@ void MayaScape::HandleClientObjectID(StringHash eventType, VariantMap &eventData
         scene_ = serverConnection->GetScene();
         scene_->MarkNetworkUpdate();
 
-      //  SaveScene(true);
+//        SaveScene(true);
         /*
         // A VectorBuffer object is convenient for constructing a message to send
         VectorBuffer msg;
