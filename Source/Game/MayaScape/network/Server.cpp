@@ -426,9 +426,7 @@ void Server::HandleClientIdentity(StringHash eventType, VariantMap& eventData)
         return;
 
     // Transmit scene from server to client
- //   newConnection->SetScene(scene_);
-
-
+    newConnection->SetScene(scene_);
 
     URHO3D_LOGINFO("HandleClientIdentity - client assigned for scene replication.");
     URHO3D_LOGINFOF("Server: Scene checksum -> %s", ToStringHex(scene_->GetChecksum()).CString());
