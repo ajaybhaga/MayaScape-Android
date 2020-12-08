@@ -568,7 +568,7 @@ void Server::HandleClientConnected(StringHash eventType, VariantMap& eventData)
 
     // When a client connects, assign to scene to begin scene replication
     auto* newConnection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
-    newConnection->SetScene(scene_);
+//    newConnection->SetScene(scene_);
 /*
     // Then create a controllable object for that client
     Node* newObject = CreateControllableObject();
